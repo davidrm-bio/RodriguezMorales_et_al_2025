@@ -5,7 +5,7 @@ Description:
 
 Author: David Rodriguez Morales
 Date Created: 
-Python Version: 3.11.8
+Python Version: 3.9.18
 """
 
 #<editor-fold desc="Deconvolution of ST">
