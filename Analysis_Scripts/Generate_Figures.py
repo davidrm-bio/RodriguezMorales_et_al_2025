@@ -47,6 +47,7 @@ misty_path = os.path.join(result_path, 'Figures/4_FunctionalAnalysis/mistyR_Anal
 
 # Load Objects
 aging = sc.read_h5ad(os.path.join(object_path, 'Visium_YoungOld_AgingProject_28August_Cleaned.h5ad'))
+aging.X = aging.layers['SCT_norm'].copy()
 ref = sc.read_h5ad(os.path.join(object_path, 'Cell2location/snRNA_RefAging_Manuscript.h5ad'))
 ref.X = ref.layers['logcounts'].copy()
 adata_ccc = sc.read_h5ad(
