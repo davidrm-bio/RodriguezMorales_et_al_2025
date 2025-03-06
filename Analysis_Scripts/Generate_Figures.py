@@ -58,11 +58,6 @@ adata_ccc.obs = aging.obs.reindex(adata_ccc.obs_names)
 ct_catgs = list(ref.obs.annotation.cat.categories)
 ct_colors = ref.uns['annotation_colors']
 ct_zip = dict(zip(ct_catgs, ct_colors))
-
-aging.obs['vessels'] = aging.obs['vessels'].str.replace('nVasc', 'nonVasc')  # Rename
-aging.obs['log1p_total_counts'] = np.log1p(aging.obs.total_counts)
-aging.obs['log1p_n_genes_by_counts'] = np.log1p(aging.obs.n_genes_by_counts)
-
 # </editor-fold>
 
 
