@@ -37,7 +37,7 @@ table_path = os.path.join(main_path, 'Tables')
 ########################################################################################################################
 
 
-#<editor-fold desc="QC - snRNA Julian (Vidal et al.)">
+#<editor-fold desc="QC - snRNA (Vidal et al.)">
 snRNA_processed = sc.read_h5ad(os.path.join(object_path, 'Cell2location/Individual_Reference/', 'Julian-Aging.h5ad'))
 
 # Filter cells and genes
@@ -62,7 +62,7 @@ snRNA_processed.layers['logcounts'] = snRNA_processed.X.copy()
 #</editor-fold>
 
 
-#<editor-fold desc="QC - snRNA Julian (Senolytic)">
+#<editor-fold desc="QC - snRNA (Wagner et al)">
 snRNA_senolytic = sc.read_h5ad(
     os.path.join(object_path, 'Cell2location/Individual_Reference/Senolytics-autoAnnot.h5ad'))
 snRNA_senolytic.X = snRNA_senolytic.layers['counts'].copy()
