@@ -1330,6 +1330,20 @@ ax[1].set_title('Leiden Clusters')
 plt.savefig(os.path.join(figure_path, f'ExtFig1f_UMAP_SubclusteringMP.svg'), bbox_inches='tight')
 # </editor-fold>
 
+# <editor-fold desc="Extended Figure 1g. UMAPs Subclustering FB">
+fb = ref[ref.obs.annotation.isin(['Fibroblasts', 'Fibro_activ'])].copy()
+bkn.bbknn(fb, use_rep='X_scVI', batch_key='sample')
+sc.tl.umap(fb)
+sc.tl.leiden(fb, resolution=1, n_iterations=2, flavor='igraph', directed=False)
+
+ax = davidrPlotting.pl_umap(fb, ['annotation', 'leiden', 'Postn', 'Meox1'], size=40, ncols=2, figsize=(10, 8),
+                            show=False, common_legend=True, legend_loc='on data', legend_fontsize=15,
+                            legend_fontweight=750, legend_fontoutline=1.5)
+ax[0].set_title('Annotation')
+ax[1].set_title('Leiden Clusters')
+plt.savefig(os.path.join(figure_path, f'ExtFig1g_UMAP_SubclusteringFB.svg'), bbox_inches='tight')
+# </editor-fold>
+
 
 # <editor-fold desc="Extended Figure 2a. Violinplots QC ST">
 sp_batch_colors = [('Young_1', '#8c564b'), ('Young_2', '#e377c2'), ('Young_3', '#7f7f7f'),
