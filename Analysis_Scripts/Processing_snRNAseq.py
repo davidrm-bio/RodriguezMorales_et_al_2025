@@ -262,3 +262,16 @@ with pd.ExcelWriter(os.path.join(table_path, 'DGE', '241205_DGE_snRNA_Aging_Anno
         table_subset = table_subset[table_subset['pvals_adj'] < 0.05].sort_values('logfoldchanges', ascending=False)
         table_subset.to_excel(writer, sheet_name=f'SigGenes_{cluster}', index=False)
 #</editor-fold>
+
+#<editor-fold desc="DGE Vidal - Young Vs Old Per CellType - Supplementary Table 3">
+vidal = ref[ref.obs.Experiment == 'JulianAging'].copy()
+
+table = pd.DataFrame([])
+for celltype in vidal.obs.annotation.unique():
+    sdata = vidal[vidal.obs.annotation == celltype]
+    davidrScanpy.rank_genes_groups(sdata, groupby='age', method='wilcoxon', tie_correct=True)
+    df = sc.get.rank_genes_groups_df(sdata, group='Old', pval_cutoff=0.05)  # Take Significant DEGs
+    df['celltype'] = celltype  # Add information of the current celltype
+    table = pd.concat([table, df])
+table.to_excel(os.path.join(table_path, 'DEGs_YoungVsOld_snRNAseq.xlsx'), index=False)
+#</editor-fold>
