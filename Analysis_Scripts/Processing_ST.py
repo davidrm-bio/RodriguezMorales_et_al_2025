@@ -662,7 +662,7 @@ for batch in aging.obs['sample'].unique():
 #</editor-fold>
 
 
-#<editor-fold desc="Senescence  - Identification of Hotspots of senescence - Supplementary Table 3">
+#<editor-fold desc="Senescence  - Identification of Hotspots of senescence - Supplementary Table 4">
 figure_path = os.path.join(main_path, 'Figures/4_FunctionalAnalysis/Senescence/')
 
 # Load Data
