@@ -38,6 +38,9 @@ import davidrScanpy
 
 np.random.seed(13)
 
+# To re-generate the figures download the H5ADs available in Biostudies and Figshare to you local machine 
+# and change the paths variables in line 44-49
+
 main_path = '/mnt/davidr/scStorage/DavidR/Spatial/Visium/'
 result_path = os.path.join(main_path, 'Results/')
 object_path = os.path.join(result_path, 'Objects/Scanpy/')
@@ -60,6 +63,11 @@ ct_catgs = list(ref.obs.annotation.cat.categories)
 ct_colors = ref.uns['annotation_colors']
 ct_zip = dict(zip(ct_catgs, ct_colors))
 # </editor-fold>
+
+
+########################################################################################################################
+# - Figure 1
+########################################################################################################################
 
 
 # <editor-fold desc="Figure 1a. UMAP snRNA across celltypes">
@@ -196,6 +204,11 @@ plt.savefig(os.path.join(figure_path, f'Fig1d_SpatialPlot_SpatialPlot_YoungOld.s
 # </editor-fold>
 
 
+########################################################################################################################
+# - Figure 2
+########################################################################################################################
+
+
 # <editor-fold desc="Figure 2a. Stacked barplot of niche proportion across spatial locations">
 # Calculate proportion of niches across anatomic regions
 df = aging.obs['clusters'].to_frame().copy()
@@ -303,6 +316,11 @@ plt.savefig(os.path.join(figure_path, 'Fig2c_Clustermap_celltype_across_niches.s
 
 
 # Figure 2d --> CytosScape
+
+
+########################################################################################################################
+# - Figure 3 and Extended Figure 6a/6b
+########################################################################################################################
 
 
 # Figure 3a --> Drawing made
@@ -687,6 +705,11 @@ plt.savefig(os.path.join(figure_path, 'Fig3h_Heatmap_Progeny.svg'), bbox_inches=
 # </editor-fold>
 
 
+########################################################################################################################
+# - Figure 4
+########################################################################################################################
+
+
 # Figure 4a --> Drawing made
 
 
@@ -1052,6 +1075,11 @@ plt.savefig(os.path.join(figure_path, 'Fig4i_Quantification_Adventitial_Recruted
 # </editor-fold>
 
 
+########################################################################################################################
+# - Figure 5
+########################################################################################################################
+
+
 # Figure 5a --> Drawing made
 
 
@@ -1228,6 +1256,11 @@ plt.savefig(os.path.join(figure_path, 'Fig5h_Heatmap_ImmuneInhibitory.svg'), bbo
 # </editor-fold>
 
 
+########################################################################################################################
+# - Extended Figure 1
+########################################################################################################################
+
+
 # <editor-fold desc="Extended Figure 1a. ViolinPlot of QC metrics in the snRNA">
 batch_colors = [('Young_B1', '#8c564b'), ('Young_B2', '#ffbb78'), ('Young_B3', '#98df8a'),
                 ('Young_B4', '#ff9896'), ('Old_B1', '#1f77b4'), ('Old_B2', '#ff7f0e'),
@@ -1343,6 +1376,11 @@ ax[0].set_title('Annotation')
 ax[1].set_title('Leiden Clusters')
 plt.savefig(os.path.join(figure_path, f'ExtFig1g_UMAP_SubclusteringFB.svg'), bbox_inches='tight')
 # </editor-fold>
+
+
+########################################################################################################################
+# - Extended Figure 2
+########################################################################################################################
 
 
 # <editor-fold desc="Extended Figure 2a. Violinplots QC ST">
@@ -1597,6 +1635,11 @@ plt.savefig(os.path.join(figure_path, 'ExtFig2h_Barplot_prop_cts.svg'), bbox_inc
 # </editor-fold>
 
 
+########################################################################################################################
+# - Extended Figure 3
+########################################################################################################################
+
+
 # <editor-fold desc="Extended Figure 3a. ST Anatomic Regions">
 labels_color = {'LVi': 'lightsteelblue', 'LVm': 'cornflowerblue', 'LVo': 'royalblue',
                 'RV': '#f6b278', 'SEP': 'salmon', 'BG': 'whitesmoke'}
@@ -1667,6 +1710,11 @@ for clust in df_cond.clusters.unique():
     _, p = mannwhitneyu(sdf[sdf.condition == 'Young'].norm, sdf[sdf.condition == 'Old'].norm)
     print(f'Pval for {clust}: {round(p, 2)}')
 # </editor-fold>
+
+
+########################################################################################################################
+# - Extended Figure 4
+########################################################################################################################
 
 
 # <editor-fold desc="Extended Figure 4a-e and Extended Figure 5c-h">
@@ -1965,6 +2013,11 @@ for clust in adata.obs.clusters.unique():
 # </editor-fold>
 
 
+########################################################################################################################
+# - Extended Figure 5
+########################################################################################################################
+
+
 # <editor-fold desc="Extended Figure 5a. Dotplot genes associated to microglia GO terms">
 genes = ['Grn', 'Il33', 'Trem2', 'Tyrobp']
 ax = davidrScanpy.dotplot(ref, groupby='annotation', var_names=genes, show=False, figsize=(2.85, 5))
@@ -2003,6 +2056,11 @@ ax['color_legend_ax'].grid(False)
 ax['mainplot_ax'].set_xticklabels(ax['mainplot_ax'].get_xticklabels(), fontweight='bold')
 plt.savefig(os.path.join(figure_path, 'ExtFig5b_M1M2MP_UpOldMP_UpOldNiche7.svg'), bbox_inches='tight')
 # </editor-fold>
+
+
+########################################################################################################################
+# - Extended Figure 6
+########################################################################################################################
 
 
 # <editor-fold desc="Extended Figure 6c and 6d (lineplots)">
@@ -2154,6 +2212,11 @@ davidrPlotting.barplot_nUMI(vidal_fb, 'C3', 'age', 'logcounts',
                             groups_cond=['Old'], path=figure_path,
                             filename='ExtFig6e_Barplot_C3_VidalFB.svg')
 # </editor-fold>
+
+
+########################################################################################################################
+# - Extended Figure 7
+########################################################################################################################
 
 
 # <editor-fold desc="Extended Figure 7a. Vessel annotation">
