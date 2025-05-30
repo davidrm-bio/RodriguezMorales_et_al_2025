@@ -10,6 +10,4 @@ In this repository is possible to access to the code used in the analysis of the
 The supplementary tables associated to the manuscript are available [here](SUP_Tables/). 
 
 # Citation
-Vascular niches are the primary hotspots for aging within the multicellular architecture of cardiac tissue
-David Rodriguez Morales, Veronica Larcher, Mariano Ruz Jurado, Lukas Tombor, Lukas Zanders, Julian U. G. Wagner, Andreas M. Zeiher, Christoph Kuppe, David John, Marcel Schulz, Stefanie Dimmeler
-bioRxiv 2025.03.30.646237; doi: https://doi.org/10.1101/2025.03.30.646237
+> Vascular niches are the primary hotspots for aging within the multicellular architecture of cardiac tissue. David Rodriguez Morales, Veronica Larcher, Mariano Ruz Jurado, Lukas Tombor, Lukas Zanders, Julian U. G. Wagner, Andreas M. Zeiher, Christoph Kuppe, David John, Marcel Schulz, Stefanie Dimmeler bioRxiv 2025.03.30.646237; doi: https://doi.org/10.1101/2025.03.30.646237
