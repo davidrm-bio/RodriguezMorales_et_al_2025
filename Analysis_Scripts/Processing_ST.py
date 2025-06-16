@@ -889,3 +889,198 @@ merged_CCC = ad.concat(dict_CCC.values(), keys=dict_CCC.keys(), label='sample', 
 merged_CCC.write(os.path.join(object_path, 'Scanpy/HoloNet/Visium_YoungOld_HoloNet_CCC_230624.h5ad'))
 #</editor-fold>
 
+
+
+########################################################################################################################
+# - Processing of Human Left Ventricle ST
+########################################################################################################################
+
+#<editor-fold desc="Integration">
+import STAligner
+import scanpy.external as sce
+
+human_lv = sc.read_h5ad(os.path.join(object_path, 'visium-OCT_LV_lognormalised.h5ad'))
+
+batch_list, adj_list, sections_ids = [], [], []
+# Calculate Spatial Network
+for sample in human_lv.obs['sangerID'].unique():
+    adata = davidrUtility.select_slide(human_lv, sample, 'sangerID')
+    STAligner.Cal_Spatial_Net(adata, rad_cutoff=375)
+    sc.pp.highly_variable_genes(adata, flavor='seurat_v3', n_top_genes=9000)
+    adata = adata[:, adata.var.highly_variable].copy()
+    adj_list.append(adata.uns['adj'])
+    batch_list.append(adata)
+    sections_ids.append(sample)
+
+# Concatenate Samples
+ad_concat = ad.concat(batch_list, label='slice_name', keys=sections_ids)
+ad_concat.obs['batch_name'] = ad_concat.obs['slice_name'].astype('category')
+
+adj_concat = np.asarray(adj_list[0].todense())
+for batch_id in range(1, len(sections_ids)):
+    adj_concat = scipy.linalg.block_diag(adj_concat, np.asarray(adj_list[batch_id].todense()))
+
+ad_concat.uns['edgeList'] = np.nonzero(adj_concat)
+
+ad_concat = STAligner.train_STAligner(ad_concat, verbose=True, hidden_dims=[250, 30],
+                                      knn_neigh=50, margin=2.5)
+
+# Trasfer Integrated matrix
+human_lv.obsm['STAligner'] = ad_concat.obsm['STAligner']
+
+sce.pp.bbknn(human_lv, batch_key='sangerID', use_rep='STAligner', neighbors_within_batch=3, metric='manhattan')
+sc.tl.leiden(human_lv, random_state=666, key_added="leiden_STAligner", resolution=0.5)
+sc.tl.umap(human_lv, random_state=666, min_dist=0.05, spread=2)
+
+sc.pl.umap(human_lv, color=['sangerID', 'age', 'leiden_STAligner'])
+human_lv.write('/media/Storage/DavidR/Objects_Submission/HumanLV_Integrated.h5ad')
+#</editor-fold>
+
+
+#<editor-fold desc="Senescence Scoring">
+human_lv = sc.read_h5ad('/media/Storage/DavidR/Objects_Submission/HumanLV_Integrated.h5ad')
+human_lv.obs['clusters'] = 'Niche h' + human_lv.obs.leiden_STAligner.astype(str)
+
+
+# CellAge
+cellage = pd.read_csv('/mnt/davidr/scStorage/DavidR/BioData/SenescenceScore/CellAge3.tsv', sep='\t')
+cellage['GeneHuman'] = cellage['Gene symbol']
+cellage['dataset'] = 'CellAge'
+cellage = cellage[cellage['Senescence Effect'] == 'Induces']
+
+# AgingAtlas
+tmp_files = [f for f in os.listdir('/mnt/davidr/scStorage/DavidR/BioData/SenescenceScore/') if 'AgingAtlas_Human' in f]
+agingAtlas = pd.DataFrame()
+for f in tmp_files:
+    tmp = pd.read_csv('/mnt/davidr/scStorage/DavidR/BioData/SenescenceScore/' + f)
+    agingAtlas = pd.concat([agingAtlas, tmp])
+agingAtlas['GeneHuman'] = agingAtlas['Symbol'].copy()
+agingAtlas['dataset'] = 'AgingAtlas'
+
+# SenMayo
+senmayo = pd.read_excel('/mnt/davidr/scStorage/DavidR/BioData/SenMayo_Genes.xlsx', sheet_name='mouse')
+senmayo['GeneHuman'] = senmayo['Gene(murine)'].str.upper()
+senmayo['dataset'] = 'SenMayo'
+
+# Cellular Senescence
+msig = gp.Msigdb('2023.1.Hs')
+gmt = msig.get_gmt(category='msigdb', dbver="2023.1.Hs")
+cellularSenescence = pd.DataFrame(gmt['GOBP_CELLULAR_SENESCENCE'], columns=['GeneHuman'])
+cellularSenescence['dataset'] = 'GOSenescence'  # CellularSenescence --> 108 unique genes
+
+# Fridman & Tainsky
+fridTain = pd.read_csv('/mnt/davidr/scStorage/DavidR/BioData/SenescenceScore/Fridman&Tainsky.csv')
+fridTain['GeneHuman'] = fridTain['SYMBOL']
+fridTain['dataset'] = 'Fridman&Tainsky'
+
+# Combine every dataset
+cols = ['GeneHuman', 'dataset']
+score = pd.concat(
+    [cellage[cols], agingAtlas[cols], senmayo[cols], cellularSenescence[cols], fridTain[cols]])
+score = score.groupby('GeneHuman')['dataset'].apply(lambda x: '; '.join(x)).reset_index()
+
+score = score[score.GeneHuman.isin(human_lv.var_names)]
+human_lv = human_lv[human_lv.obs.sangerID != 'HCAHeartST8795933']
+sc.tl.rank_genes_groups(human_lv, groupby='age', method='wilcoxon', tie_correct=True)
+dge = sc.get.rank_genes_groups_df(human_lv, group='65-70', pval_cutoff=0.05)
+
+dge_set = set(dge.names)  # 6621 genes
+score_set = set(score.GeneHuman)  # 892 genes
+ssg = dge_set & score_set  # 463 senesence sensitive genes
+sc.tl.score_genes(human_lv, list(ssg), score_name='senescence')
+
+
+
+top5 = human_lv.obs.senescence.copy()
+top5 = list(top5[top5 > np.percentile(top5, 95)].index)
+
+import anndata as ad
+from tqdm import tqdm
+
+def get_surrounding(adata: ad.AnnData,
+                    in_spot: int = None,
+                    bc_spot: str = None,
+                    radius: float = 100,
+                    get_bcs=True) -> list:
+    """Find the index positions that surrounds a position (index)
+    :param adata: anndata object
+    :param in_spot: index of the barcode
+    :param bc_spot: barcode to check
+    :param get_bcs: return barcodes instead of index position
+    :param radius: radius. Minimum of 100 for Visium
+    :return: a list of surrounding indices
+    """
+    if in_spot is None and bc_spot is None:
+        assert 'Specify only in_spot or bc_spot'
+
+    if in_spot is not None:
+        spot = adata.obsm['spatial'][in_spot]
+    if bc_spot is not None:
+        spot = adata[adata.obs_names == bc_spot, :].obsm['spatial'][0]
+
+    surrounding = []
+    for i, sp in enumerate(adata.obsm['spatial']):
+        distance = ((spot[0] - sp[0]) ** 2 + (spot[1] - sp[1]) ** 2) ** .5
+        if distance <= radius:
+            surrounding.append(i)
+    if get_bcs:
+        return list(adata.obs_names[surrounding])
+    else:
+        return surrounding
+
+
+data = pd.DataFrame()
+for batch in tqdm(human_lv.obs['sangerID'].unique()):
+    sdata = human_lv[human_lv.obs['sangerID'] == batch]
+    annotation = {bc: [10, 10, 10, 10, 10, 10, 10] for bc in sdata.obs_names}
+    for bc in top5:
+        if bc not in sdata.obs_names:
+            continue
+
+        # Hspot > dist100 > dist200 > dist300 > dist400 > dist500 > rest
+        annotation[bc][0] = 0
+
+        # Calculate BCs in the gradient space
+        hexamer = get_surrounding(sdata, bc_spot=bc, radius=300)
+
+        extended = get_surrounding(sdata, bc_spot=bc, radius=450)
+        extended = [val for val in extended if val not in hexamer]  # Remove BCs in  previous locations
+
+        greater = get_surrounding(sdata, bc_spot=bc, radius=750)
+        greater = [val for val in greater if
+                   val not in hexamer and val not in extended]  # Remoce BCs in previous locations
+
+        major = get_surrounding(sdata, bc_spot=bc, radius=850)
+        major = [val for val in major if
+                 val not in hexamer and val not in extended and val not in greater]  # Remoce BCs in previous locations
+
+        external = get_surrounding(sdata, bc_spot=bc, radius=1050)
+        external = [val for val in external if
+                    val not in hexamer and val not in major and val not in greater and val not in major]  # Remoce BCs in previous locations
+
+        hexamer.remove(bc)  # Remove Hspot BCs
+
+        # Add a score for each location
+        cont = 1
+        for case, label in [(hexamer, 1), (extended, 2), (greater, 3), (major, 4), (external, 5)]:
+            for bc_inner in case:
+                annotation[bc_inner][cont] = label
+            cont += 1
+
+    # Hspot -> 0; dist100 -->1; dist200 -->2; dist300 --> 3; dist400 --> 4; dist500 --> 5; rest --> 10
+    annotation = pd.DataFrame.from_dict(annotation).T
+    annotation = pd.DataFrame(annotation.min(axis=1), columns=['code'])
+    annotation['annotation'] = annotation.code.replace({0: 'Hspot', 1: 'dist300', 2: 'dist450',
+                                                        3: 'dist650',
+                                                        4: 'dist750', 5: 'dist800', 10: 'rest'})
+    data = pd.concat([data, annotation['annotation']])
+
+data = data.reindex(index=human_lv.obs_names)
+human_lv.obs['senescence_gradient'] = pd.Categorical(data.annotation)
+
+human_lv.write('/media/Storage/DavidR/Objects_Submission/HumanLV_Integrated.h5ad')
+#</editor-fold>
+
+
+
+
