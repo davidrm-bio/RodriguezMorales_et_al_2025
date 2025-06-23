@@ -441,13 +441,17 @@ plt.savefig(os.path.join(figure_path, 'Fig2c_Clustermap_celltype_across_niches.s
 # <editor-fold desc="Figure 2e. Dotplot MP in niches">
 # Generate an AnnData of the cell type abundance
 df = aging.obsm['c2l'].copy()
+df['MP'] = df['MP'] + df['Ccr2+MP']
 adata = ad.AnnData(X=df.values, obs=list(df.index), var=list(df.columns))
 adata.obs_names = adata.obs[0]
 adata.var_names = adata.var[0]
 adata.obs = aging.obs.copy()
 # Remove duplicates (celltype is in obs and var_names)
 for col in adata.var_names:
-    del adata.obs[col]
+    try:
+        del adata.obs[col]
+    except KeyError:
+        pass
 
 adata.obs['cluster+Cond'] = pd.Categorical(adata.obs['clusters'].astype(str) + '_' + adata.obs['condition'].astype(str))
 
@@ -459,7 +463,7 @@ axs = sc.pl.dotplot(adata, groupby='cluster+Cond', swap_axes=True, var_names=['M
                                       'Niche 6_3m', 'Niche 6_18m', 'Niche 7_3m', 'Niche 7_18m',
                                       'Niche 8_3m', 'Niche 8_18m','Niche 9_3m', 'Niche 9_18m',
                                       'Niche 10_3m', 'Niche 10_18m'],
-                    show=False, cmap='Reds', colorbar_title='Mean prop\n in group',
+                    show=False, cmap='Reds', colorbar_title='Mean prop\n in group', vmin=0.01,
                     size_title='Fraction of spots\nin group(%)', figsize=(7.8, 2.4))
 # Layout
 ax = axs['mainplot_ax']
@@ -499,9 +503,12 @@ plt.savefig(os.path.join(figure_path, 'Fig2e_Dotplot_MPCcr2MP_Niches.svg'), bbox
 for clust in adata.obs.clusters.unique():
     tdata = adata[adata.obs.clusters == clust]
     sc.tl.rank_genes_groups(tdata, groupby='condition', method='wilcoxon', tie_correct=True)
-    tdf = sc.get.rank_genes_groups_df(tdata, group='Old', pval_cutoff=0.05)
+    tdf = sc.get.rank_genes_groups_df(tdata, group='18m', pval_cutoff=0.05)
     tdf = tdf[tdf.names.isin(['MP', 'Ccr2+MP'])]
     print (clust, tdf, '\n\n')
+
+
+
 # </editor-fold>
 
 
@@ -1227,11 +1234,10 @@ C(Condition):C(Region)   89.157143   1.0   35.456340  9.890563e-06
 Residual                 47.776667  19.0         NaN           NaN
 """
 
+from scipy.stats import kruskal
 _, p = shapiro(row1[:6])  # pval = 0.911 --> does not follow normality
-_, p = mannwhitneyu(row1[:6], row2[:6], nan_policy='omit')  # Test Adventitial
-# Pval = 0.004329 --> 4.33e-03
-_, p = mannwhitneyu(row3[:6], row4[:6], nan_policy='omit')  # Test Interstitital
-# Pval = 0.7143 --> 0.71
+_, p = kruskal(row1[:6], row2[:6], nan_policy='omit')  # Test Adventitial --> 0.0062
+_, p = kruskal(row3[:6], row4[:6], nan_policy='omit')  # Test Interstitital  --> 0.6473
 # </editor-fold>
 
 
@@ -1283,8 +1289,8 @@ bp.set_xlabel('')
 bp.set_ylabel('Relative abundance\nCd68+/Lyve1- cells (%)')
 bp.set_xticklabels(bp.get_xticklabels(), fontweight='bold', fontsize=15)
 bp.set_title('Adventitial Lyve1- MP')
-bp.set_ylim(0, 110)
-plt.savefig(os.path.join(figure_path, 'Fig4i_Quantification_Adventitial_RecrutedMP.svg'), bbox_inches='tight')
+bp.set_ylim(0, 35)
+plt.savefig(os.path.join(figure_path, 'Fig4j_Quantification_Adventitial_RecrutedMP.svg'), bbox_inches='tight')
 # </editor-fold>
 
 
@@ -2706,18 +2712,15 @@ plt.savefig(os.path.join(figure_path, 'ExtFig8b_Clustermap_celltype_across_Human
 
 
 # <editor-fold desc="Extended Figure 8c. Co-localisation of MoMP, FB4a, SMC">
-fig, axs = plt.subplots(3, 1, figsize=(4, 8))
-sc.pl.spatial(lv1, color='SMC2_art', ax=axs[0], size=1.5, colorbar_loc=None, vmax='p99.2', title='')
+fig, axs = plt.subplots(2, 1, figsize=(4, 8))
 sc.pl.spatial(lv1,  color='FB4_activated', ax=axs[1], size=1.5, colorbar_loc=None, vmax='p99.2', title='')
 sc.pl.spatial(lv1, color='MoMP', ax=axs[2], size=1.5, colorbar_loc=None,  vmax='p99.2', vcenter=0, cmap='RdBu_r', title='')
 
 davidrUtility.axis_format(axs[0], 'SP')
 davidrUtility.axis_format(axs[1], 'SP')
-davidrUtility.axis_format(axs[2], 'SP')
 
 fig.text(0.02, 0.15, 'MoMP', fontdict={'weight':'bold', 'size':18}, rotation='vertical')
 fig.text(0.02, 0.4, 'FB4_activated', fontdict={'weight':'bold', 'size':18}, rotation='vertical')
-fig.text(0.02, 0.75, 'SMC2_art', fontdict={'weight':'bold', 'size':18}, rotation='vertical')
 
 fig = plt.gcf()
 cbar_ax = fig.add_axes([0.9, .05, 0.03, 0.15])  # Position [left, bottom, width, height]
@@ -2728,7 +2731,7 @@ cbar = fig.colorbar(sm, cax=cbar_ax)
 cbar.ax.set_title('Cell prop', fontweight='bold', loc='left', fontsize=10)
 cbar.set_ticks([-0.15, 0.15])
 cbar.set_ticklabels(['Min', 'Max'], fontweight='bold',fontsize=10)
-plt.savefig(os.path.join(figure_path, 'ExtFig8c_SP_SMC_FBa_MP.svg'), bbox_inches='tight')
+plt.savefig(os.path.join(figure_path, 'ExtFig8c_SP_FBa_MP.svg'), bbox_inches='tight')
 # </editor-fold>
 
 
@@ -2785,9 +2788,9 @@ del df_young['age'], df_old['age']
 df_young = df_young.pivot(index=['clusters'], columns='senescence_gradient',
                           values='norm').reindex(columns=['Hspot', 'dist300', 'dist450', 'dist650',
                                                           'dist750', 'dist800', 'rest'],
-                                                 index=['Niche h7','Niche h0','Niche h6',
-                                                        'Niche h3','Niche h5', 'Niche h1',
-                                                        'Niche h2','Niche h4',])
+                                                 index=['Niche h0','Niche h7','Niche h5',
+                                                    'Niche h6','Niche h4','Niche h2',
+                                                    'Niche h1','Niche h3',])
 
 
 df_old = df_old.pivot(index=['clusters'], columns='senescence_gradient',
@@ -2819,7 +2822,7 @@ sns.move_legend(ax, loc='center right', frameon=False, title='Senescence\nGradie
                 bbox_to_anchor=(1.3, .5))
 ax.set_xticklabels(ax.get_xticklabels(), fontweight='bold', rotation=45, va='top', ha='right')
 ax.set_xlabel('')
-plt.savefig(os.path.join(figure_path, 'ExtFig8f_StackBarplot_HumanLV_SenesenceGradient_65-70.svg'), bbox_inches='tight')
+plt.savefig(os.path.join(figure_path, 'ExtFig8f_StackBarplot_HumanLV_SenesenceGradient_65-70_Resorted.svg'), bbox_inches='tight')
 
 
 # </editor-fold>
@@ -2829,22 +2832,24 @@ plt.savefig(os.path.join(figure_path, 'ExtFig8f_StackBarplot_HumanLV_SenesenceGr
 # - Extended Figure 9
 ########################################################################################################################
 
+
 # Extended Figure 9a --> staining
 
-# Extended Figure 9b --> staining
-
-
-
-# <editor-fold desc="Extended Figure 9c. Dotplot Do not eat me snRNA">
+# <editor-fold desc="Extended Figure 9b. Dotplot Do not eat me snRNA">
 ref.obs['myeloid_annot'] = [annot if annot in ['MP', 'Ccr2+MP'] else 'non-myeloid' for annot in ref.obs.annotation]
+vidal = ref[ref.obs.Experiment == 'JulianAging'].copy()
 davidrPlotting.dotplot(vidal, ['myeloid_annot', 'age'],
                        ['Cd47', 'Sirpa', 'Cd24a', 'Pilra', 'Clec4a1', 'Clec12a',
                         'Ccr2', 'Ccl2', 'Ccl4', 'Ccl5', 'Ccr5', 'Vcam1', 'Icam1'],
-                       swap_axes=False, path=figure_path, filename='ExtFig9c_Dotplot_DoNotEatMe_Recluit_Mouse.svg',
-                       xticks_rotation=45, figsize=(7, 3.5))
+                       swap_axes=True, path=figure_path, filename='ExtFig9b_Dotplot_DoNotEatMe_Recluit_Mouse.svg',
+                    figsize=(4, 3.5))
 # </editor-fold>
 
-# Extended Figure 9d --> Quantification
+# Extended Figure  9c --> Staining
+
+
+# Extended Figure  9d --> Staining
+
 
 # <editor-fold desc="Extended Figure 9e. Dotplot Do not eat me in Human LV">
 davidrPlotting.dotplot(human[human.obs.region == 'LV'], 'age',['CD47', 'SIRPA',
@@ -2859,15 +2864,17 @@ davidrPlotting.dotplot(human[human.obs.region == 'LV'], 'age',['CD47', 'SIRPA',
 # - Extended Figure 10
 ########################################################################################################################
 
-# Extended Figure 10a --> Representative image of cell event in interstitital D+Q
+# Extended Figure 10a --> Representative image of cell event in interstitital D+Q and quantification
 
-# Extended Figure 10b --> Diastolic fuction D+Q
+# Extended Figure 10b --> Representative image of cell event in interstitital Fisetin and quantification
 
-# Extended Figure 10c --> Fibrosis Quantification for D+Q (Adv and Int)
+# Extended Figure 10c --> Diastolic function  D+Q
 
 # Extended Figure 10d --> Diastolic function Fisetin
 
-# Extended Figure 10e --> Fibrosis Quantification for Fisetin (Adv and Int)
+# Extended Figure 10e --> Fibrosis Quantification for D+Q (Adv and Int)
+
+# Extended Figure 10f --> Fibrosis Quantification for Fisetin (Adv and Int)
 
 
 ########################################################################################################################
@@ -2878,7 +2885,7 @@ davidrPlotting.dotplot(human[human.obs.region == 'LV'], 'age',['CD47', 'SIRPA',
 
 # Extended Figure 11b --> Quantification for SMC/FB/EC Cell Event Splitting PlY/PlO/D+Q in Adv and Inst
 
-# Extended Figure 11c --> Quantification for SMC/FB/EC Cell Event  Splitting channels (Fisetin)
+# Extended Figure 11c --> Representative image for SMC/FB/EC Cell Event Splitting channels (Fisetin)
 
 # Extended Figure 11d --> Quantification for SMC/FB/EC Cell Event Splitting PlY/PlO/Fisetin in Adv and Inst
 
@@ -2893,7 +2900,6 @@ davidrPlotting.dotplot(human[human.obs.region == 'LV'], 'age',['CD47', 'SIRPA',
 # Extended Figure 12b --> Quantification of changes in Lyve1+/- MP in Instertital in Fisetin
 
 
-# Extended Figure 12c --> Maybe representative image for D+Q also?
+# Extended Figure 12c --> Representative image for D+Q and Fisetin
 
 
-# Extended Figure 12c --> Maybe representative image for Fisetin also?
