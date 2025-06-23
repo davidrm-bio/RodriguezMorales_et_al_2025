@@ -29,6 +29,8 @@ results_path = Path('/mnt/davidr/scStorage/DavidR/Spatial/Visium/Results/Revisio
 object_path = results_path / 'Objects'
 figure_path = results_path / 'FiguresForReviewers' 
 table_path = results_path / 'Tables'
+#local_path = '/Volumes/scStorage/DavidR/Spatial/Visium/Results/Revision/Objects/Vidal_plus_TabulaMuris_Harmony.h5ad'
+#adata = sc.read_h5ad(local_path)
 
 adata = sc.read_h5ad(object_path / 'Vidal_plus_TabulaMuris_Harmony.h5ad')
 aging = sc.read_h5ad('/media/Storage/DavidR/Objects_Submission/Visium_YoungOld_AgingProject_28August_Cleaned.h5ad')
@@ -66,16 +68,25 @@ for gene in genes:
                     bbox_to_anchor=(1.1, 1))
     bp.set_title(f'{gene}')
     plt.savefig(figure_path / f'FigureReviewerSex_Barplot_{gene}_MaleFemale_PseudoBulk.svg', bbox_inches='tight')
+
+
+male = adata[(adata.obs.sex == 'male') & (adata.obs.age.isin(['3m', '18m']))].copy()
+female = adata[(adata.obs.sex == 'female') & (adata.obs.age.isin(['3m', '18m']))].copy()
+
+sc.tl.rank_genes_groups(male, groupby='age', method='wilcoxon', tie_correct=True)
+sc.tl.rank_genes_groups(female, groupby='age', method='wilcoxon', tie_correct=True)
+
+tmp = sc.get.rank_genes_groups_df(male, group='18m').set_index('names')
+print(tmp.loc[['Per1', 'Usp2'],'pvals_adj'])
+tmp = sc.get.rank_genes_groups_df(female, group='18m').set_index('names')
+print(tmp.loc[['Per1', 'Usp2'],'pvals_adj'])
 # </editor-fold>
 
 # <editor-fold desc="FigD. Barplots - Proinflammatory and Sirpa Genes">
 colors= {'3m':'sandybrown', '18m':'royalblue'}
 genes = ['Sirpa', 'Cd209g', 'Ccl8', 'Fgr']
 
-
 mp = adata[adata.obs.annotation.isin(['MP_resident', 'MP_recruit'])]
-
-
 df_mp = davidrUtility.ExtractExpression(mp, groups=['sex', 'age'], features=genes)
 
 for gene in genes:
@@ -90,6 +101,18 @@ for gene in genes:
                     bbox_to_anchor=(1.1, 1))
     bp.set_title(f'{gene} in MP')
     plt.savefig(figure_path / f'FigureReviewerSex_Barplot_{gene}_MaleFemale_MP.svg', bbox_inches='tight')
+
+
+male = mp[mp.obs.sex == 'male'].copy()
+female = mp[mp.obs.sex == 'female'].copy()
+
+sc.tl.rank_genes_groups(male, groupby='age', method='wilcoxon', tie_correct=True)
+sc.tl.rank_genes_groups(female, groupby='age', method='wilcoxon', tie_correct=True)
+
+tmp = sc.get.rank_genes_groups_df(male, group='18m').set_index('names')
+print(tmp.loc[genes,'pvals_adj'])
+tmp = sc.get.rank_genes_groups_df(female, group='18m').set_index('names')
+print(tmp.loc[genes,'pvals_adj'])
 # </editor-fold>
 
 
@@ -104,10 +127,6 @@ for gene in genes:
 # Fig B. TAC Interstitital - Total CellEvent normalised on DAPI count only and
 # Cell Event splitting by CellType, normalised on DAPI Count
 
-# Fig C. Pooled Barplot of CellEvent splitting CellType (Sham/TAC/Pooled Young Pl (D+Q/Fisetin) / Pooled Old Pl (D+Q/Fisetin)
-
-
-# Add splittinh channels from D+Q/Fisetin
 
 ########################################################################################################################
 # - Figure for Reviewer - Arteries/Lymphatics/Veins
@@ -156,7 +175,6 @@ ax.set_xticklabels([txt.get_text().split('_')[-1] for txt in ax.get_xticklabels(
 ax.set_yticklabels(ax.get_yticklabels(), fontweight='bold')
 plt.savefig(os.path.join(figure_path, 'Dotplot_SenescenceScore_VesselsAging.svg'), bbox_inches='tight')
 # </editor-fold>
-
 
 ########################################################################################################################
 # - Figure for Reviewer - DGE RV/LV Young and Old
@@ -220,10 +238,5 @@ for names, table in [('3m', table_3m), ('18m', table_18m)]:
     table_main = pd.concat([table_main, df_up, df_down], axis=1)
 
 table_main.to_excel(figure_path / 'DGE_LV_vs_RV_SPlittingCondition.xlsx', index=False)
-
-
-
-
-
 # </editor-fold>
 
