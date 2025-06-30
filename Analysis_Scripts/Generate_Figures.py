@@ -40,23 +40,23 @@ np.random.seed(13)
 
 
 def plotting_theme(
-    dpi: int = 100,
-    dpi_save: int = 300,
-    facecolor: str = 'white',
-    colormap: str = 'Reds',
-    frameon: bool = True,
-    transparent: bool = False,
-    fontsize: int = 13,
-    axes_fontsize: int = 15,
-    axes_fontweight: str = 'bold',
-    title_fontsize: int = 18,
-    title_fontweight: str = 'bold',
-    legend_fontsize: int = 13,
-    ticks_fontsize: int = 12,
-    figsize: tuple =(2.4, 3.4),
-    top_spine: bool = False,
-    right_spine: bool = False,
-    grid: bool = False,
+        dpi: int = 100,
+        dpi_save: int = 300,
+        facecolor: str = 'white',
+        colormap: str = 'Reds',
+        frameon: bool = True,
+        transparent: bool = False,
+        fontsize: int = 13,
+        axes_fontsize: int = 15,
+        axes_fontweight: str = 'bold',
+        title_fontsize: int = 18,
+        title_fontweight: str = 'bold',
+        legend_fontsize: int = 13,
+        ticks_fontsize: int = 12,
+        figsize: tuple = (2.4, 3.4),
+        top_spine: bool = False,
+        right_spine: bool = False,
+        grid: bool = False,
 ) -> None:
     """Set general settings.
 
@@ -180,7 +180,6 @@ ct_zip = dict(zip(ct_catgs, ct_colors))
 # </editor-fold>
 
 
-
 ########################################################################################################################
 # - Figure 1
 ########################################################################################################################
@@ -193,7 +192,7 @@ ax.legend(handles=[mlines.Line2D([0], [0], marker=".", color=c,
                                  lw=0, label=lab, markerfacecolor=c, markeredgecolor=None,
                                  markersize=13) for lab, c in zip(ct_catgs, ct_colors)],
           loc='center right', frameon=False, edgecolor='black', title='', bbox_to_anchor=(1.5, .5),
-          fontsize=11, ncols=1,labelspacing=0.2)
+          fontsize=11, ncols=1, labelspacing=0.2)
 plt.savefig(os.path.join(figure_path, 'Fig1a_UMAP_snRNA_Annotation.svg'), bbox_inches='tight')
 # </editor-fold>
 
@@ -206,7 +205,7 @@ ax.legend(handles=[mlines.Line2D([0], [0], marker=".", color=c,
                                  markersize=13) for lab, c in
                    zip(list(aging.obs.clusters.cat.categories), aging.uns['clusters_colors'])],
           loc='center right', frameon=False, edgecolor='black', title='',
-        bbox_to_anchor=(1.5, .5), fontsize=11, ncols=1,labelspacing=0.2)
+          bbox_to_anchor=(1.5, .5), fontsize=11, ncols=1, labelspacing=0.2)
 plt.savefig(os.path.join(figure_path, f'Fig1b_UMAP_ST_Niches.svg'), bbox_inches='tight')
 # </editor-fold>
 
@@ -461,7 +460,7 @@ axs = sc.pl.dotplot(adata, groupby='cluster+Cond', swap_axes=True, var_names=['M
                                       'Niche 2_3m', 'Niche 2_18m', 'Niche 3_3m', 'Niche 3_18m',
                                       'Niche 4_3m', 'Niche 4_18m', 'Niche 5_3m', 'Niche 5_18m',
                                       'Niche 6_3m', 'Niche 6_18m', 'Niche 7_3m', 'Niche 7_18m',
-                                      'Niche 8_3m', 'Niche 8_18m','Niche 9_3m', 'Niche 9_18m',
+                                      'Niche 8_3m', 'Niche 8_18m', 'Niche 9_3m', 'Niche 9_18m',
                                       'Niche 10_3m', 'Niche 10_18m'],
                     show=False, cmap='Reds', colorbar_title='Mean prop\n in group', vmin=0.01,
                     size_title='Fraction of spots\nin group(%)', figsize=(7.8, 2.4))
@@ -481,7 +480,8 @@ top_ax = fig.add_axes([pos.x0, pos.y1, pos.width, 0.1])  # Adjust height as need
 labels = ['Niche 0', 'Niche 1', 'Niche 2', 'Niche 3', 'Niche 4', 'Niche 5',
           'Niche 6', 'Niche 7', 'Niche 8', 'Niche 9', 'Niche 10']
 bracket_positions = [(0, 2), (2, 4), (4, 6), (6, 8), (8, 10), (10, 12),
-                     (12, 14), (14, 16), (16, 18), (18, 20), (20, 22)]  # Tuples of (start, end) indices of clusters to group
+                     (12, 14), (14, 16), (16, 18), (18, 20),
+                     (20, 22)]  # Tuples of (start, end) indices of clusters to group
 
 # Add brackets on top for the groups
 for (i, (x_start, x_end)) in enumerate(bracket_positions):
@@ -489,7 +489,8 @@ for (i, (x_start, x_end)) in enumerate(bracket_positions):
     patch = PathPatch(path, lw=2, fill=False)
     top_ax.add_patch(patch)
     label_position = (x_start + x_end) / 2
-    top_ax.text(label_position+0.5, 1.5, labels[i], ha='center', va='bottom', fontsize=10, fontweight='bold', rotation=45)
+    top_ax.text(label_position + 0.5, 1.5, labels[i], ha='center', va='bottom', fontsize=10, fontweight='bold',
+                rotation=45)
 
 # Set limits and remove spines
 top_ax.set_xlim(-.5, 22.5)  # Adjust based on total number of var_names
@@ -505,9 +506,7 @@ for clust in adata.obs.clusters.unique():
     sc.tl.rank_genes_groups(tdata, groupby='condition', method='wilcoxon', tie_correct=True)
     tdf = sc.get.rank_genes_groups_df(tdata, group='18m', pval_cutoff=0.05)
     tdf = tdf[tdf.names.isin(['MP', 'Ccr2+MP'])]
-    print (clust, tdf, '\n\n')
-
-
+    print(clust, tdf, '\n\n')
 
 # </editor-fold>
 
@@ -525,11 +524,10 @@ sc.tl.rank_genes_groups(niche7, groupby='condition', method='wilcoxon', tie_corr
 table7 = sc.get.rank_genes_groups_df(niche7, group='18m', pval_cutoff=0.05, log2fc_min=.25)
 
 # Intersect of both
-set(table7.names) & set(table.names) #  Genes Upregulated in Both
+set(table7.names) & set(table.names)  # Genes Upregulated in Both
 
 # Manually explore genes associated to M1/M2 phenotype
 table.to_excel(os.path.join(table_path, 'DGE_MyeloidYoungOld_Vidal.xlsx'), index=False)
-
 
 genes = ['Fgr', 'Irf7', 'Bst2', 'Cd209g', 'Cd209f', 'Ccl8', 'Ccl6', 'Timp2', 'Vsig4']
 
@@ -542,7 +540,6 @@ ax['mainplot_ax'].set_xticklabels(ax['mainplot_ax'].get_xticklabels(), fontweigh
 ax['mainplot_ax'].set_yticklabels(ax['mainplot_ax'].get_yticklabels(), fontsize=13)
 plt.savefig(os.path.join(figure_path, 'Fig2f_M1M2MP_UpOldMP_UpOldNiche7.svg'), bbox_inches='tight')
 # </editor-fold>
-
 
 
 ########################################################################################################################
@@ -883,8 +880,6 @@ X = adata_concat.X.copy()
 X_shifted = X + np.abs(X.min(axis=0))
 adata_concat.layers['X_shifted'] = X_shifted
 
-
-
 # DGE between Young and Old based on pathways activities
 table = pd.DataFrame()
 for clust in adata_concat.obs.clusters.unique():
@@ -938,7 +933,6 @@ plt.savefig(os.path.join(figure_path, 'Fig3h_Heatmap_Progeny.svg'), bbox_inches=
 # </editor-fold>
 
 
-
 ########################################################################################################################
 # - Figure 4
 ########################################################################################################################
@@ -950,7 +944,6 @@ plt.savefig(os.path.join(figure_path, 'Fig3h_Heatmap_Progeny.svg'), bbox_inches=
 # <editor-fold desc="Figure 4b. Histology and vessel annotation">
 # Generate individual panels to modify in insckape
 young1 = davidrUtility.select_slide(aging, 'Young_1')
-
 
 # Part 1 - Histology and Zoom-In for Young_1
 axs = sc.pl.spatial(young1, show=False, frameon=True)[0]
@@ -966,7 +959,6 @@ for ax in [axs, sub_axs]:
     ax.set_xlabel('')
     ax.set_ylabel('')
 plt.savefig(os.path.join(figure_path, 'Fig4b_Part1_Young1_Histology.pdf'), bbox_inches='tight', dpi=1000)
-
 
 # Part 2 - Vessels and Zoom-In for Young_1
 fig, axs = plt.subplots(1, 2, figsize=(12, 12))
@@ -1130,7 +1122,6 @@ for col in adata.var_names:  # Remove the celltype names in .obs otherwise there
 adata.obs['vessel+cond'] = pd.Categorical(adata.obs.vessels.astype(str) + '_' + adata.obs.condition.astype(str))
 adata = adata[adata.obs.vessels.isin(['Arteries', 'Veins', 'Lymphatics', 'nonVasc'])]  # Exclude Mix Vessels
 
-
 # Generate the Dotplot
 axs = sc.pl.dotplot(adata, groupby='vessel+cond', swap_axes=True,
                     var_names=['MP', 'Ccr2+MP', 'B_cells', 'T_cells',  # Celltypes of interest
@@ -1198,21 +1189,20 @@ for vessel in adata.obs.vessels.unique():
 
 # <editor-fold desc="Figure 4h. Barplot quantification of Cd68+ cells in Aging (Stainings)">
 row1 = [12, 10.2, 13, 11.7, 10.8, 14.3, '3m', 'Adventitial']  # CD68+ (%) Adventitial - Young
-row2 = [np.nan, 18, 18.1,  22.7, 18.7, 21,'18m', 'Adventitial']  # Cd68+ (%) Adventitial - Old
+row2 = [np.nan, 18, 18.1, 22.7, 18.7, 21, '18m', 'Adventitial']  # Cd68+ (%) Adventitial - Old
 row3 = [6.3, 6.7, 6, 5.2, 4.9, 6.4, '3m', 'Interstitial']  # CD68+ (%) Interstitital - Young
 row4 = [np.nan, 5, 9.1, 4.8, 4.9, 6.5, '18m', 'Interstitial']  # CD68+ (%) Interstitital - Old
 
-df = pd.DataFrame([row1, row2, row3, row4], columns = ['Sample1', 'Sample2', 'Sample3', 'Sample4',
-                                                       'Sample5', 'Sample6', 'Condition', 'Region'],
+df = pd.DataFrame([row1, row2, row3, row4], columns=['Sample1', 'Sample2', 'Sample3', 'Sample4',
+                                                     'Sample5', 'Sample6', 'Condition', 'Region'],
                   ).melt(id_vars=['Condition', 'Region'])
-
 
 fig, axs = plt.subplots(1, 1, figsize=(5, 4))
 bp = sns.barplot(df, x='Region', y='value', hue='Condition', order=['Interstitial', 'Adventitial'],
-            hue_order=['3m', '18m'], palette={'3m':'sandybrown', '18m':'royalblue'},
-            capsize=0.1, ax=axs, gap=0.1)
+                 hue_order=['3m', '18m'], palette={'3m': 'sandybrown', '18m': 'royalblue'},
+                 capsize=0.1, ax=axs, gap=0.1)
 bp = sns.stripplot(df, x='Region', y='value', hue='Condition', order=['Interstitial', 'Adventitial'],
-            hue_order=['3m', '18m'], ax=axs, dodge=True, color='k', alpha=0.75, s=6)
+                   hue_order=['3m', '18m'], ax=axs, dodge=True, color='k', alpha=0.75, s=6)
 bp.set_xlabel('')
 bp.set_ylabel('Relative abundance\nCd68+ cells (%)', fontsize=16)
 bp.set_xticklabels(bp.get_xticklabels(), fontweight='bold', fontsize=15)
@@ -1235,6 +1225,7 @@ Residual                 47.776667  19.0         NaN           NaN
 """
 
 from scipy.stats import kruskal
+
 _, p = shapiro(row1[:6])  # pval = 0.911 --> does not follow normality
 _, p = kruskal(row1[:6], row2[:6], nan_policy='omit')  # Test Adventitial --> 0.0062
 _, p = kruskal(row3[:6], row4[:6], nan_policy='omit')  # Test Interstitital  --> 0.6473
@@ -1242,11 +1233,11 @@ _, p = kruskal(row3[:6], row4[:6], nan_policy='omit')  # Test Interstitital  -->
 
 
 # <editor-fold desc="Figure 4i. Quantification of Cd68+ Lyve1+ cells in Aging Adventitial (Stainings)">
-row1 = [85.2, 89.4, 91.9, 87.5, 83.3, 91.4, '3m', 'Lyve1+', 'Adventitial']  #  Adventitial - Young
-row2 = [72.6, 77.2, 73.9,86.1, 76.6, 68.1, '18m', 'Lyve1+', 'Adventitial']  #  Adventitial - Old
+row1 = [85.2, 89.4, 91.9, 87.5, 83.3, 91.4, '3m', 'Lyve1+', 'Adventitial']  # Adventitial - Young
+row2 = [72.6, 77.2, 73.9, 86.1, 76.6, 68.1, '18m', 'Lyve1+', 'Adventitial']  # Adventitial - Old
 
-df = pd.DataFrame([row1, row2], columns = ['Sample1', 'Sample2', 'Sample3', 'Sample4',
-                                                       'Sample5', 'Sample6', 'Condition', 'Case', 'Region'],
+df = pd.DataFrame([row1, row2], columns=['Sample1', 'Sample2', 'Sample3', 'Sample4',
+                                         'Sample5', 'Sample6', 'Condition', 'Case', 'Region'],
                   ).melt(id_vars=['Condition', 'Case', 'Region'])
 
 # Test for significance
@@ -1254,9 +1245,9 @@ _, p = shapiro(row1[:6])  # pval = 0.661  --> Does not follow normality
 _, p = mannwhitneyu(row1[:6], row2[:6])
 
 fig, axs = plt.subplots(1, 1, figsize=(4, 5))
-bp = sns.barplot(df, x='Condition', y='value', order=['3m', '18m'], palette={'3m':'sandybrown', '18m':'royalblue'},
-            capsize=0.1, ax=axs, gap=0.1)
-bp = sns.stripplot(df, x='Condition', y='value',  order=['3m', '18m'], ax=axs, dodge=True, color='k', alpha=0.75, s=6)
+bp = sns.barplot(df, x='Condition', y='value', order=['3m', '18m'], palette={'3m': 'sandybrown', '18m': 'royalblue'},
+                 capsize=0.1, ax=axs, gap=0.1)
+bp = sns.stripplot(df, x='Condition', y='value', order=['3m', '18m'], ax=axs, dodge=True, color='k', alpha=0.75, s=6)
 bp.set_xlabel('')
 bp.set_ylabel('Relative abundance\nCd68+/Lyve1+ cells (%)')
 bp.set_xticklabels(bp.get_xticklabels(), fontweight='bold', fontsize=15)
@@ -1266,24 +1257,22 @@ plt.savefig(os.path.join(figure_path, 'Fig4h_Quantification_Adventitial_Resident
 # </editor-fold>
 
 
-
 # <editor-fold desc="Figure 4j . Quantification of Cd68+ Lyve1- cells in Aging Adventitial (Stainings)">
-row1 = [14.8, 10.6, 8.1, 12.5, 16.7, 8.6, '3m', 'Lyve1-', 'Adventitial']  #  Adventitial - Young
-row2 = [27.4, 22.8, 26.1, np.nan, 23.4, 31.9, '18m', 'Lyve1-', 'Adventitial']  #  Adventitial - Old
+row1 = [14.8, 10.6, 8.1, 12.5, 16.7, 8.6, '3m', 'Lyve1-', 'Adventitial']  # Adventitial - Young
+row2 = [27.4, 22.8, 26.1, np.nan, 23.4, 31.9, '18m', 'Lyve1-', 'Adventitial']  # Adventitial - Old
 
-df = pd.DataFrame([row1, row2], columns = ['Sample1', 'Sample2', 'Sample3', 'Sample4',
-                                                       'Sample5', 'Sample6', 'Condition', 'Case', 'Region'],
+df = pd.DataFrame([row1, row2], columns=['Sample1', 'Sample2', 'Sample3', 'Sample4',
+                                         'Sample5', 'Sample6', 'Condition', 'Case', 'Region'],
                   ).melt(id_vars=['Condition', 'Case', 'Region'])
 
 # Test for significance
 _, p = shapiro(row1[:6])  # pval = 0.661  --> Does not follow normality
 _, p = mannwhitneyu(row1[:6], row2[:6], nan_policy='omit')
 
-
 fig, axs = plt.subplots(1, 1, figsize=(4, 5))
-bp = sns.barplot(df, x='Condition', y='value', order=['3m', '18m'], palette={'3m':'sandybrown', '18m':'royalblue'},
-            capsize=0.1, ax=axs, gap=0.1)
-bp = sns.stripplot(df, x='Condition', y='value',  order=['3m', '18m'], ax=axs,
+bp = sns.barplot(df, x='Condition', y='value', order=['3m', '18m'], palette={'3m': 'sandybrown', '18m': 'royalblue'},
+                 capsize=0.1, ax=axs, gap=0.1)
+bp = sns.stripplot(df, x='Condition', y='value', order=['3m', '18m'], ax=axs,
                    dodge=True, color='k', alpha=0.75, s=6)
 bp.set_xlabel('')
 bp.set_ylabel('Relative abundance\nCd68+/Lyve1- cells (%)')
@@ -1386,8 +1375,9 @@ cm.ax_heatmap.spines[['top', 'right', 'left', 'bottom']].set_visible(True)
 cm.ax_heatmap.set_xlabel('')
 cm.ax_heatmap.grid(False)
 cm.ax_cbar.grid(False)
-cm.ax_heatmap.set_xticklabels(cm.ax_heatmap.get_xticklabels(), rotation=45, ha='right', va='top', fontweight='bold', fontsize=15)
-cm.ax_heatmap.set_yticklabels(cm.ax_heatmap.get_yticklabels(),  fontsize=15)
+cm.ax_heatmap.set_xticklabels(cm.ax_heatmap.get_xticklabels(), rotation=45, ha='right', va='top', fontweight='bold',
+                              fontsize=15)
+cm.ax_heatmap.set_yticklabels(cm.ax_heatmap.get_yticklabels(), fontsize=15)
 plt.savefig(os.path.join(figure_path, 'Fig5d_Heatmap_Cts_SenescenceGradient.svg'), bbox_inches='tight')
 # </editor-fold>
 
@@ -1541,7 +1531,8 @@ for idx, value in enumerate(['log(nUMIs)', 'log(nGenes)']):
     vp.grid(False)
     sns.despine()
     if idx == 1:
-        vp.set_xticklabels(vp.get_xticklabels(), rotation=75, fontweight='bold', ha='right', rotation_mode='anchor', fontsize=13)
+        vp.set_xticklabels(vp.get_xticklabels(), rotation=75, fontweight='bold', ha='right', rotation_mode='anchor',
+                           fontsize=13)
         vp.set_xlabel('')
     vp.set_yticklabels(vp.get_yticklabels(), fontsize=13)
 
@@ -1634,7 +1625,6 @@ ax[0].set_title('Annotation')
 ax[1].set_title('Leiden Clusters')
 plt.savefig(os.path.join(figure_path, f'ExtFig1g_UMAP_SubclusteringFB.svg'), bbox_inches='tight')
 # </editor-fold>
-
 
 
 ########################################################################################################################
@@ -1894,7 +1884,6 @@ plt.savefig(os.path.join(figure_path, 'ExtFig2h_Barplot_prop_cts.svg'), bbox_inc
 # </editor-fold>
 
 
-
 ########################################################################################################################
 # - Extended Figure 3
 ########################################################################################################################
@@ -1964,12 +1953,13 @@ sns.move_legend(bp, loc='upper right', ncols=2, frameon=False, title='Condition'
 bp.grid(False)
 plt.savefig(os.path.join(figure_path, f'ExtFig3c_ProportionNichesAging.svg'), bbox_inches='tight')
 
-
 # Test significance
 for clust in df_cond.clusters.unique():
     sdf = df_cond[df_cond.clusters == clust]
     _, p = mannwhitneyu(sdf[sdf.condition == 'Young'].norm, sdf[sdf.condition == 'Old'].norm)
     print(f'Pval for {clust}: {round(p, 2)}')
+
+
 # </editor-fold>
 
 
@@ -2021,7 +2011,7 @@ def split_bar_gsea(df: pd.DataFrame,
                    color_up=[],
                    color_down=[],
                    title: str = 'Top 10 GO Terms in each Condition',
-                   show: bool = True) -> plt.axis :
+                   show: bool = True) -> plt.axis:
     """ **Split BarPlot for GO terms**
 
     This function generates a split barplot. This is a plot where the top 10 Go terms
@@ -2216,10 +2206,11 @@ for figname, cluster in [('ExtFig4a', 'Niche 7'), ('ExtFig4b', 'Niche 0'), ('Ext
 genes = ['Grn', 'Trem2', 'Tyrobp']
 ax = davidrScanpy.dotplot(ref, groupby='annotation', var_names=genes, show=False, figsize=(2.85, 5))
 ax['mainplot_ax'].spines[['top', 'right']].set_visible(True)
-ax['mainplot_ax'].set_xticklabels(ax['mainplot_ax'].get_xticklabels(), fontweight='bold', rotation=45, ha='right', va='top', fontsize=13)
+ax['mainplot_ax'].set_xticklabels(ax['mainplot_ax'].get_xticklabels(), fontweight='bold', rotation=45, ha='right',
+                                  va='top', fontsize=13)
 ax['color_legend_ax'].grid(False)
 plt.savefig(os.path.join(figure_path, 'ExtFig5a_MicrogliaGenes.svg'), bbox_inches='tight')
-#</editor-fold>
+# </editor-fold>
 
 
 # <editor-fold desc="Extended Figure 5b. Barplots for Fgr, Myo1f, Cd209g and Ccl8 in ST">
@@ -2228,7 +2219,7 @@ import dotools_py as do
 plotting_theme()  # Overrides the do theme
 davidrScanpy.rank_genes_groups(aging, groupby='condition', method='wilcoxon', tie_correct=True)
 table = sc.get.rank_genes_groups_df(aging, group='18m').set_index('names')
-colors = {'3m':'sandybrown', '18m':'royalblue'}
+colors = {'3m': 'sandybrown', '18m': 'royalblue'}
 
 do.pl.barplot(aging, 'Fgr', 'condition', batch_key='sample',
               order=['3m', '18m'], palette=colors, figsize=(3, 4), ctrl_cond='3m',
@@ -2255,8 +2246,7 @@ do.pl.barplot(aging, 'Myo1f', 'condition', batch_key='sample',
               title='Myo1f in ST', path=figure_path, filename='ExtFig5b_IV_Barplot_Myo1f_ST.svg',
               layer='logcounts')
 
-
-#</editor-fold>
+# </editor-fold>
 
 
 # <editor-fold desc="Extended Figure 5I. Barplots for Cry2, Per1, Usp2 in snRNA">
@@ -2271,19 +2261,18 @@ do.pl.barplot(ref, 'Usp2', 'age', order=['3m', '18m'], palette=colors,
               filename='ExtFig5i_I_Barplot_Usp2_snRNA.svg')
 
 do.pl.barplot(ref, 'Cry2', 'age', order=['3m', '18m'], palette=colors,
-              figsize=(3, 4), ctrl_cond='3m', groups_cond='18m',  txt='FDR = ',
+              figsize=(3, 4), ctrl_cond='3m', groups_cond='18m', txt='FDR = ',
               groups_pvals=table.loc['Cry2', 'pvals_adj'],
               title='Cry2 PseudoBulk\nin snRNA', path=figure_path,
               filename='ExtFig5i_II_Barplot_Cry2_snRNA.svg')
 
-
 ax = do.pl.barplot(ref, 'Per1', 'age', order=['3m', '18m'], palette=colors,
-              figsize=(3, 4), ctrl_cond='3m', groups_cond='18m',  txt='FDR = ',
-              groups_pvals=table.loc['Per1', 'pvals_adj'],
-              title='Per1 PseudoBulk\nin snRNA',  show=False)
+                   figsize=(3, 4), ctrl_cond='3m', groups_cond='18m', txt='FDR = ',
+                   groups_pvals=table.loc['Per1', 'pvals_adj'],
+                   title='Per1 PseudoBulk\nin snRNA', show=False)
 ax.set_ylim(0, 0.7)
-plt.savefig(os.path.join(figure_path,'ExtFig5i_I_Barplot_Per1_snRNA.svg'), bbox_inches='tight')
-#</editor-fold>
+plt.savefig(os.path.join(figure_path, 'ExtFig5i_I_Barplot_Per1_snRNA.svg'), bbox_inches='tight')
+# </editor-fold>
 
 
 ########################################################################################################################
@@ -2304,16 +2293,16 @@ for batch in tqdm(aging.obs['sample'].unique()):
         # Get Proportions in Hexa Space - Spots that are 100 um away
         neigh_BCs = list(davidrUtility.get_surrounding(sdata, idx, radius=100, get_bcs=True))
         neigh_BCs.remove(bc)  # Exclude the intra spot
-        norm_hexa = sdata.obsm['c2l'].loc[neigh_BCs,:].sum().sum()
-        hexa_c2l = sdata.obsm['c2l'].loc[neigh_BCs,:].sum(axis=0) / norm_hexa  # Compute Proportion
+        norm_hexa = sdata.obsm['c2l'].loc[neigh_BCs, :].sum().sum()
+        hexa_c2l = sdata.obsm['c2l'].loc[neigh_BCs, :].sum(axis=0) / norm_hexa  # Compute Proportion
         hexa_c2l.index = hexa_c2l.index + '_HexaSpace'
 
         # Get Proportion in Extended Space - Spots that are 200 um away
         extend_BCs = list(davidrUtility.get_surrounding(sdata, idx, radius=200, get_bcs=True))
         extend_BCs.remove(bc)  # exclude the intra spot
         extend_BCs = [val for val in extend_BCs if val not in neigh_BCs]  # exclude the hexa spots
-        norm_extend = sdata.obsm['c2l'].loc[extend_BCs,:].sum().sum()
-        extend_c2l = sdata.obsm['c2l'].loc[extend_BCs,:].sum(axis=0) / norm_extend  # compute proportion
+        norm_extend = sdata.obsm['c2l'].loc[extend_BCs, :].sum().sum()
+        extend_c2l = sdata.obsm['c2l'].loc[extend_BCs, :].sum(axis=0) / norm_extend  # compute proportion
         extend_c2l.index = extend_c2l.index + '_ExtendedSpace'
 
         new_row = pd.DataFrame(pd.concat([intra_c2l, hexa_c2l, extend_c2l]), columns=[bc]).T
@@ -2322,19 +2311,22 @@ for batch in tqdm(aging.obs['sample'].unique()):
         cellInteraction = pd.concat([cellInteraction, new_row])
 
 # Convert to wide format
-data_wide = cellInteraction.reset_index().melt(id_vars=['Condition', 'index'], var_name='Group', value_name='Proportion')
+data_wide = cellInteraction.reset_index().melt(id_vars=['Condition', 'index'], var_name='Group',
+                                               value_name='Proportion')
 data_wide['space'] = data_wide['Group'].str.split('_').str[-1]
-data_wide['CellTypes'] = data_wide['Group'].str.split('_IntraSpace').str[0].str.split('_HexaSpace').str[0].str.split('_ExtendedSpace').str[0]
+data_wide['CellTypes'] = \
+data_wide['Group'].str.split('_IntraSpace').str[0].str.split('_HexaSpace').str[0].str.split('_ExtendedSpace').str[0]
 # Duplicate df to have the same but in reverse to generate a simetric plot
 tmp = data_wide.copy()
 tmp['space'] = '-' + tmp['space']
-tmp =tmp[tmp.space !='-Intra']  # Exclude the intra spot, only once
+tmp = tmp[tmp.space != '-Intra']  # Exclude the intra spot, only once
 data_wide = pd.concat([data_wide, tmp]).reset_index()
-data_wide['space'] = pd.Categorical(data_wide.space, categories=['-ExtendedSpace', '-HexaSpace', 'IntraSpace', 'HexaSpace', 'ExtendedSpace'], ordered=True)
-
+data_wide['space'] = pd.Categorical(data_wide.space,
+                                    categories=['-ExtendedSpace', '-HexaSpace', 'IntraSpace', 'HexaSpace',
+                                                'ExtendedSpace'], ordered=True)
 
 # CM distribution compared to rest of cell types
-cm_all = data_wide[data_wide['CellTypes'].isin(['Fibroblasts','CapEC', 'SMC', 'Ccr2+MP', 'CM'])].copy()
+cm_all = data_wide[data_wide['CellTypes'].isin(['Fibroblasts', 'CapEC', 'SMC', 'Ccr2+MP', 'CM'])].copy()
 # Get the BCs with the top 8 % of CM proportion
 tmp = cm_all[cm_all['Group'] == 'CM_IntraSpace']
 tmp = tmp.loc[tmp['Proportion'] > np.percentile(tmp['Proportion'], 92), 'index']
@@ -2370,7 +2362,6 @@ ax1[1].legend([legend[val] for val in legend_order], legend_order, title="CellTy
               title_fontproperties={'weight': 'bold'})
 plt.savefig(os.path.join(figure_path, 'ExtFig6c_lineplot_CM_vs_Rest.svg'), bbox_inches='tight')
 
-
 # Extended Figure 6d - lineplot part
 # B cells and Ccr2+Mp
 mp_b = data_wide[data_wide['CellTypes'].isin(['B_cells', 'Ccr2+MP'])]
@@ -2380,20 +2371,21 @@ tmp = tmp.loc[tmp['Proportion'] > np.percentile(tmp['Proportion'], 92), 'index']
 mp_b = mp_b[mp_b['index'].isin(tmp)].copy()
 
 fig, ax1 = plt.subplots(1, 1, figsize=(4, 5))
-lp = sns.lineplot(mp_b, x='space', y='Proportion', style='Condition', hue='CellTypes',  estimator='mean', markers=True, dashes=True, palette=ct_zip)
+lp = sns.lineplot(mp_b, x='space', y='Proportion', style='Condition', hue='CellTypes', estimator='mean', markers=True,
+                  dashes=True, palette=ct_zip)
 lp.set_xlabel('')
 lp.set_ylabel('Mean Cell Proportion')
 lp.set_xticklabels(['Extended', 'Hexa', 'SameSpot', 'Hexa', 'Extended'], rotation=75, ha='right', va='top')
-sns.move_legend(lp, loc='upper center',ncols=2,frameon=False, bbox_to_anchor=(0.5, 1.35))
+sns.move_legend(lp, loc='upper center', ncols=2, frameon=False, bbox_to_anchor=(0.5, 1.35))
 plt.savefig(os.path.join(figure_path, 'ExtFig6d_lineplot.svg'), bbox_inches='tight')
-#</editor-fold>
+# </editor-fold>
 
 
 # <editor-fold desc="Extended Figure 6d. Spatial distribution of B cells and Ccr2+MP">
 old5 = davidrUtility.select_slide(aging, 'Old_5')
 young2 = davidrUtility.select_slide(aging, 'Young_2')
 
-fig, axs = plt.subplots(2,2, figsize=(8, 8))
+fig, axs = plt.subplots(2, 2, figsize=(8, 8))
 plt.subplots_adjust(hspace=0.05, wspace=.05, left=.05)  # Spacing between subplots
 axs = axs.flatten()
 sc.pl.spatial(young2, color=['Ccr2+MP'], size=1.5, bw=True, vmax='p99.2', ax=axs[0], title='Young_2', colorbar_loc=None)
@@ -2422,21 +2414,21 @@ plt.savefig(os.path.join(figure_path, 'ExtFig6d_ST_BcellsCcr2MP.svg'), bbox_inch
 
 # <editor-fold desc="Extended Figure 6e. C3 and C3ar1 in snRNA">
 # We check on Vidal et al. dataset which is Aging
-vidal = ref[ref.obs.Experiment =='JulianAging']
-vidal_mp = vidal[vidal.obs.annotation =='MP']
-vidal_fb = vidal[vidal.obs.annotation =='Fibroblasts']
+vidal = ref[ref.obs.Experiment == 'JulianAging']
+vidal_mp = vidal[vidal.obs.annotation == 'MP']
+vidal_fb = vidal[vidal.obs.annotation == 'Fibroblasts']
 
 davidrPlotting.pl_umap(vidal, ['C3', 'C3ar1'], layer='logcounts', size=5, path=figure_path,
                        filename='ExtFig6e_UMAP_C3C3ar1.svg', ncols=1, figsize=(3, 6))
 
 davidrPlotting.barplot_nUMI(vidal_mp, 'C3ar1', 'age', 'logcounts',
-                            palette={'3m':'sandybrown', '18m':'royalblue'},
+                            palette={'3m': 'sandybrown', '18m': 'royalblue'},
                             order=['3m', '18m'], figsize=(3.2, 5), ctrl_cond='3m',
                             groups_cond=['18m'], path=figure_path,
                             filename='ExtFig6e_Barplot_C3ar1_VidalMP.svg')
 
 davidrPlotting.barplot_nUMI(vidal_fb, 'C3', 'age', 'logcounts',
-                            palette={'3m':'sandybrown', '18m':'royalblue'},
+                            palette={'3m': 'sandybrown', '18m': 'royalblue'},
                             order=['3m', '18m'], figsize=(3.2, 5), ctrl_cond='3m',
                             groups_cond=['18m'], path=figure_path,
                             filename='ExtFig6e_Barplot_C3_VidalFB.svg')
@@ -2464,11 +2456,11 @@ vmax = np.percentile(aging.obs.senescence, 99.2)
 fig, axs = plt.subplots(2, 4, figsize=(15, 10))
 axs = axs.flatten()
 fig.subplots_adjust(left=0.1)
-for idx, batch in enumerate(['Young_2', 'Young_3', 'Young_4', 'Young_5', 'Old_1','Old_2','Old_3','Old_4']):
+for idx, batch in enumerate(['Young_2', 'Young_3', 'Young_4', 'Young_5', 'Old_1', 'Old_2', 'Old_3', 'Old_4']):
     sdata = davidrUtility.select_slide(aging, batch)
     ax = sc.pl.spatial(sdata, color='senescence', size=1.5,
-                        cmap='RdBu_r', show=False, vmax=vmax,
-                        ax=axs[idx], colorbar_loc=None)[0]
+                       cmap='RdBu_r', show=False, vmax=vmax,
+                       ax=axs[idx], colorbar_loc=None)[0]
     davidrUtility.axis_format(ax, 'SP')
     ax.set_title(batch)
 
@@ -2490,12 +2482,14 @@ plt.savefig(os.path.join(figure_path, 'ExtFig7b_Spatial_Senescence.svg'), bbox_i
 # <editor-fold desc="Extended Figure 7c. Boxplot Senescence">
 df = aging.obs[['senescence_gradient', 'condition', 'clusters', 'sample', 'senescence']].copy()
 fig, axs = plt.subplots(1, 1, figsize=(5, 6))
-bx = sns.boxplot(df, x='senescence_gradient', y='senescence', hue='condition', order=['Hspot', 'dist100', 'dist200','dist300', 'dist400', 'dist500', 'rest'],
-                 hue_order=['Young', 'Old'], palette={'Young':'darkorange', 'Old':'royalblue'}, ax=axs)
+bx = sns.boxplot(df, x='senescence_gradient', y='senescence', hue='condition',
+                 order=['Hspot', 'dist100', 'dist200', 'dist300', 'dist400', 'dist500', 'rest'],
+                 hue_order=['Young', 'Old'], palette={'Young': 'darkorange', 'Old': 'royalblue'}, ax=axs)
 bx.set_ylabel('Senescence Score')
 bx.set_xlabel('')
 bx.set_xticklabels(bx.get_xticklabels(), rotation=45, ha='right', va='top', fontweight='bold')
-sns.move_legend(bx, loc='upper center', ncols=2, frameon=False, title='Condition', bbox_to_anchor=(.5, 1), title_fontproperties={'weight':'bold', 'size':14}, fontsize=12)
+sns.move_legend(bx, loc='upper center', ncols=2, frameon=False, title='Condition', bbox_to_anchor=(.5, 1),
+                title_fontproperties={'weight': 'bold', 'size': 14}, fontsize=12)
 plt.savefig(os.path.join(figure_path, 'ExtFig7c_BoxPlot_SenescenceGradient.svg'), bbox_inches='tight')
 # </editor-fold>
 
@@ -2505,24 +2499,25 @@ df = aging.obsm['c2l'].copy()
 df[['gradient', 'condition']] = aging.obs[['senescence_gradient', 'condition']]
 df = df.groupby(['gradient', 'condition']).agg('sum')
 df['total'] = df.groupby(['gradient', 'condition']).agg('sum').sum(axis=1).reindex(index=df.index)
-df = df.div(df['total'], axis=0).iloc[:,:-1]  # Compute proportions
+df = df.div(df['total'], axis=0).iloc[:, :-1]  # Compute proportions
 
 # Stacked barplot
 df_hspots = df.head(2)  # Hspots
 df_hspots.index = ['Old', 'Young']
 df_hspots = df_hspots.iloc[-2:, :].reindex(index=['Young', 'Old'], columns=['CM', 'SMC', 'Fibro_activ', 'CapEC',
                                                                             'Fibroblasts', 'ArtEC', 'EndoEC', 'T_cells',
-                                                                            'MP', 'Ccr2+MP', 'Pericytes', 'Adip', 'LymphEC',
+                                                                            'MP', 'Ccr2+MP', 'Pericytes', 'Adip',
+                                                                            'LymphEC',
                                                                             'VeinEC', 'Epi_cells', 'B_cells'])
 
 fig, axs = plt.subplots(1, 1, figsize=(3, 5))
 ax = df_hspots.plot.bar(stacked=True, color=ct_zip, ax=axs)
-sns.move_legend(ax, loc='center right', frameon=False, bbox_to_anchor=(1.3,.5), fontsize=8, title='CellType',
-                title_fontproperties={'weight':'bold'})
+sns.move_legend(ax, loc='center right', frameon=False, bbox_to_anchor=(1.3, .5), fontsize=8, title='CellType',
+                title_fontproperties={'weight': 'bold'})
 ax.set_xticklabels(ax.get_xticklabels(), rotation=45, fontweight='bold', ha='right')
 ax.set_ylabel('Proportion')
 plt.savefig(os.path.join(figure_path, 'ExtFig7d_StackedBar_ProportionCellTypes_Hspots.svg'), bbox_inches='tight')
-#</editor-fold>
+# </editor-fold>
 
 
 # <editor-fold desc="Extended Figure 7e. Lineplot showing the proportion of cts along the gradient">
@@ -2530,20 +2525,21 @@ df = aging.obsm['c2l'].copy()
 df[['gradient', 'condition']] = aging.obs[['senescence_gradient', 'condition']]
 df = df.groupby(['gradient', 'condition']).agg('sum')
 df['total'] = df.groupby(['gradient', 'condition']).agg('sum').sum(axis=1).reindex(index=df.index)
-df = df.div(df['total'], axis=0).iloc[:,:-1]  # Calculate proportions
+df = df.div(df['total'], axis=0).iloc[:, :-1]  # Calculate proportions
 
 df_plot = df.reset_index()
 df_plot = df_plot.melt(id_vars=['gradient', 'condition'])
 # Duplicate to make the plot symetric
 tmp = df_plot.copy()
 tmp['gradient'] = '-' + tmp['gradient'].astype(str)
-tmp =tmp[tmp.gradient !='-Hspot']
+tmp = tmp[tmp.gradient != '-Hspot']
 df_plot = pd.concat([df_plot, tmp]).reset_index()
-df_plot['gradient'] = pd.Categorical(df_plot.gradient, categories=['-rest', '-dist500', '-dist400', '-dist300', '-dist200',
-                                                                   '-dist100', 'Hspot', 'dist100', 'dist200', 'dist300',
-                                                                   'dist400', 'dist500', 'rest'], ordered=True)
+df_plot['gradient'] = pd.Categorical(df_plot.gradient,
+                                     categories=['-rest', '-dist500', '-dist400', '-dist300', '-dist200',
+                                                 '-dist100', 'Hspot', 'dist100', 'dist200', 'dist300',
+                                                 'dist400', 'dist500', 'rest'], ordered=True)
 # Select some celltypes
-df_plot = df_plot[df_plot['variable'].isin(['SMC', 'Fibroblasts', 'Fibro_activ', 'Ccr2+MP','ArtEC',
+df_plot = df_plot[df_plot['variable'].isin(['SMC', 'Fibroblasts', 'Fibro_activ', 'Ccr2+MP', 'ArtEC',
                                             'T_cells', 'Pericytes', 'B_cells', 'VeinEC', 'LymphEC'])]
 
 fig, axs = plt.subplots(1, 2, figsize=(6.5, 3.75))
@@ -2555,16 +2551,18 @@ lp.legend().set_visible(False)
 lp.set_ylim(0, 0.11)
 lp.set_ylabel('Cell Proportion')
 lp.set_xlabel('Young Condition')
-lp.set_xticklabels(['Rest', '', '400$\mu$m', '', '200$\mu$m', '', 'Hspot', '', '200$\mu$m', '', '400$\mu$m', '', 'Rest'],
-                   fontsize=10, rotation=45, ha='right', va='top')
+lp.set_xticklabels(
+    ['Rest', '', '400$\mu$m', '', '200$\mu$m', '', 'Hspot', '', '200$\mu$m', '', '400$\mu$m', '', 'Rest'],
+    fontsize=10, rotation=45, ha='right', va='top')
 
 lp.set_yticklabels(lp.get_yticklabels(), fontsize=10)
 lp = sns.lineplot(df_plot[df_plot.condition == 'Old'], x='gradient', y='value', hue='variable', style='condition',
-                  estimator='mean',palette=ct_zip, markersize=5, markers=True, dashes=True, ax=axs[1])
+                  estimator='mean', palette=ct_zip, markersize=5, markers=True, dashes=True, ax=axs[1])
 lp.set_ylabel('')
 lp.set_ylim(0, 0.11)
-lp.set_xticklabels(['Rest', '', '400$\mu$m', '', '200$\mu$m', '', 'Hspot', '', '200$\mu$m', '', '400$\mu$m', '', 'Rest'],
-                   fontsize=10, rotation=45, ha='right', va='top')
+lp.set_xticklabels(
+    ['Rest', '', '400$\mu$m', '', '200$\mu$m', '', 'Hspot', '', '200$\mu$m', '', '400$\mu$m', '', 'Rest'],
+    fontsize=10, rotation=45, ha='right', va='top')
 lp.set_yticklabels(lp.get_yticklabels(), fontsize=10)
 
 lp.spines['left'].set_visible(False)
@@ -2580,12 +2578,14 @@ legend = dict(zip(labels, handles))
 legend['CellTypes'] = legend['variable']
 legend['Condition'] = legend['condition']
 
-legend_order = ['CellTypes', 'B_cells', 'Fibroblasts', 'Fibro_activ', 'LymphEC', 'Ccr2+MP', 'Pericytes', 'SMC', 'T_cells', 'VeinEC']
+legend_order = ['CellTypes', 'B_cells', 'Fibroblasts', 'Fibro_activ', 'LymphEC', 'Ccr2+MP', 'Pericytes', 'SMC',
+                'T_cells', 'VeinEC']
 lp.legend().set_visible(False)
 
 # Update the legend with the unique handles and labels
-lp.legend([legend[val] for val in legend_order], legend_order, bbox_to_anchor=(1, .8), loc='upper left', ncol=1, frameon=False,
-           title_fontproperties={'weight':'bold'}, fontsize=10)
+lp.legend([legend[val] for val in legend_order], legend_order, bbox_to_anchor=(1, .8), loc='upper left', ncol=1,
+          frameon=False,
+          title_fontproperties={'weight': 'bold'}, fontsize=10)
 plt.savefig(os.path.join(figure_path, 'ExtFig7e_LinePlot_CellProportion_Gradient.svg'), bbox_inches='tight')
 # </editor-fold>
 
@@ -2609,18 +2609,21 @@ df_old = df_old.pivot(index=['vessels'], columns='senescence_gradient', values='
 
 fig, axs = plt.subplots(1, 1, figsize=(5, 6))
 ax = df_young.plot.bar(stacked=True, color={'Hspot': 'firebrick', 'dist100': 'tomato', 'dist200': 'lightsalmon',
-                                             'dist300': 'royalblue', 'dist400': 'cornflowerblue', 'dist500': 'lightsteelblue',
-                                             'rest': 'sandybrown'}, ax=axs, width=.9)
-sns.move_legend(ax, loc='center right',frameon=False, title='Senescence\nGradient', title_fontproperties={'weight':'bold'},
+                                            'dist300': 'royalblue', 'dist400': 'cornflowerblue',
+                                            'dist500': 'lightsteelblue',
+                                            'rest': 'sandybrown'}, ax=axs, width=.9)
+sns.move_legend(ax, loc='center right', frameon=False, title='Senescence\nGradient',
+                title_fontproperties={'weight': 'bold'},
                 bbox_to_anchor=(1.3, .5))
 plt.savefig(os.path.join(figure_path, 'ExtFig7f_StackedBar_Proportion_VesselsGradient_Young.svg'), bbox_inches='tight')
 
-
 fig, axs = plt.subplots(1, 1, figsize=(5, 6))
 ax = df_old.plot.bar(stacked=True, color={'Hspot': 'firebrick', 'dist100': 'tomato', 'dist200': 'lightsalmon',
-                                             'dist300': 'royalblue', 'dist400': 'cornflowerblue', 'dist500': 'lightsteelblue',
-                                             'rest': 'sandybrown'}, ax=axs, width=.9)
-sns.move_legend(ax, loc='center right',frameon=False, title='Senescence\nGradient', title_fontproperties={'weight':'bold'},
+                                          'dist300': 'royalblue', 'dist400': 'cornflowerblue',
+                                          'dist500': 'lightsteelblue',
+                                          'rest': 'sandybrown'}, ax=axs, width=.9)
+sns.move_legend(ax, loc='center right', frameon=False, title='Senescence\nGradient',
+                title_fontproperties={'weight': 'bold'},
                 bbox_to_anchor=(1.3, .5))
 plt.savefig(os.path.join(figure_path, 'ExtFig7f_StackedBar_Proportion_VesselsGradient_Old.svg'), bbox_inches='tight')
 # </editor-fold>
@@ -2634,9 +2637,9 @@ plt.savefig(os.path.join(figure_path, 'ExtFig7f_StackedBar_Proportion_VesselsGra
 davidrPlotting.pl_umap(human, 'clusters', figsize=(5, 6), title='Clusters',
                        path=figure_path, filename='ExtFig8a_UMAP_HumanLV_Clusters.svg')
 
-lv1 = davidrUtility.select_slide(human, 'HCAHeartST9383352', 'sangerID' )
+lv1 = davidrUtility.select_slide(human, 'HCAHeartST9383352', 'sangerID')
 
-fig, axs = plt.subplots(1, 1, figsize=(5, 6.67/2))
+fig, axs = plt.subplots(1, 1, figsize=(5, 6.67 / 2))
 sc.pl.spatial(lv1, color='clusters', ax=axs, size=1.5, colorbar_loc=None, vmax='p99.2', title='')
 davidrUtility.axis_format(axs, 'SP')
 plt.savefig(os.path.join(figure_path, 'ExtFig8a_SP_Clusters_HumanLV.svg'), bbox_inches='tight')
@@ -2659,8 +2662,8 @@ keep_cts = ['vCM1', 'vCM2', 'vCM3_stressed', 'vCM4', 'vCM5',
             'EC1_cap', 'EC2_cap', 'EC3_cap',
             'EC5_art', 'EC6_ven', 'EC7_endocardial', 'EC8_ln',
             'Meso',
-            'LYVE1+TIMD4+MP','MoMP',
-            'B','CD4+T_naive']
+            'LYVE1+TIMD4+MP', 'MoMP',
+            'B', 'CD4+T_naive']
 df_prop = df_prop[keep_cts]
 
 # Sort celltypes
@@ -2673,7 +2676,7 @@ df_prop = df_prop.reindex(columns=['FB4_activated', 'SMC1_basic', 'EC5_art', 'EC
 
 # Hirarchical clustering of niches
 cm = sns.clustermap(df_prop.T, cmap='RdBu_r', xticklabels=1, yticklabels=1, z_score='col',
-                    row_cluster=False, col_cluster=False,  center=0, vmax=2.5, vmin=-2.5, cbar_pos=None, square=False,
+                    row_cluster=False, col_cluster=False, center=0, vmax=2.5, vmin=-2.5, cbar_pos=None, square=False,
                     method='complete', figsize=(5.5, 7))
 
 # Get axis we want to modify
@@ -2713,14 +2716,15 @@ plt.savefig(os.path.join(figure_path, 'ExtFig8b_Clustermap_celltype_across_Human
 
 # <editor-fold desc="Extended Figure 8c. Co-localisation of MoMP, FB4a, SMC">
 fig, axs = plt.subplots(2, 1, figsize=(4, 8))
-sc.pl.spatial(lv1,  color='FB4_activated', ax=axs[1], size=1.5, colorbar_loc=None, vmax='p99.2', title='')
-sc.pl.spatial(lv1, color='MoMP', ax=axs[2], size=1.5, colorbar_loc=None,  vmax='p99.2', vcenter=0, cmap='RdBu_r', title='')
+sc.pl.spatial(lv1, color='FB4_activated', ax=axs[1], size=1.5, colorbar_loc=None, vmax='p99.2', title='')
+sc.pl.spatial(lv1, color='MoMP', ax=axs[2], size=1.5, colorbar_loc=None, vmax='p99.2', vcenter=0, cmap='RdBu_r',
+              title='')
 
 davidrUtility.axis_format(axs[0], 'SP')
 davidrUtility.axis_format(axs[1], 'SP')
 
-fig.text(0.02, 0.15, 'MoMP', fontdict={'weight':'bold', 'size':18}, rotation='vertical')
-fig.text(0.02, 0.4, 'FB4_activated', fontdict={'weight':'bold', 'size':18}, rotation='vertical')
+fig.text(0.02, 0.15, 'MoMP', fontdict={'weight': 'bold', 'size': 18}, rotation='vertical')
+fig.text(0.02, 0.4, 'FB4_activated', fontdict={'weight': 'bold', 'size': 18}, rotation='vertical')
 
 fig = plt.gcf()
 cbar_ax = fig.add_axes([0.9, .05, 0.03, 0.15])  # Position [left, bottom, width, height]
@@ -2730,7 +2734,7 @@ sm.set_array([])
 cbar = fig.colorbar(sm, cax=cbar_ax)
 cbar.ax.set_title('Cell prop', fontweight='bold', loc='left', fontsize=10)
 cbar.set_ticks([-0.15, 0.15])
-cbar.set_ticklabels(['Min', 'Max'], fontweight='bold',fontsize=10)
+cbar.set_ticklabels(['Min', 'Max'], fontweight='bold', fontsize=10)
 plt.savefig(os.path.join(figure_path, 'ExtFig8c_SP_FBa_MP.svg'), bbox_inches='tight')
 # </editor-fold>
 
@@ -2757,8 +2761,8 @@ cbar.set_ticks([-0.1, 0, 0.15])
 cbar.set_ticklabels(['-0.1', '0', '0.15'], fontweight='bold')
 cbar.ax.grid(False)
 plt.subplots_adjust(right=0.8)
-fig.text(0.18, 0.1, '65-70 years', fontdict={'weight':'bold', 'size':16}, rotation='vertical')
-fig.text(0.18, 0.6, '60-65 years', fontdict={'weight':'bold', 'size':16}, rotation='vertical')
+fig.text(0.18, 0.1, '65-70 years', fontdict={'weight': 'bold', 'size': 16}, rotation='vertical')
+fig.text(0.18, 0.6, '60-65 years', fontdict={'weight': 'bold', 'size': 16}, rotation='vertical')
 plt.savefig(os.path.join(figure_path, 'ExtFig8d_SP_SenescenceHumanLV.svg'), bbox_inches='tight')
 # </editor-fold>
 
@@ -2768,7 +2772,7 @@ do.pl.boxplot(human, ['senescence'], 'age',
               palette={'60-65': 'lightsteelblue',
                        '65-70': 'salmon'}, ctrl_cond='60-65',
               groups_cond=['65-70'], showfliers=True, ylabel='Senescence Score',
-              title='', figsize=(4, 5), path =figure_path, txt='p = ',
+              title='', figsize=(4, 5), path=figure_path, txt='p = ',
               filename='ExtFig8e_Boxplot_Human_SenescenceScoreAge.svg')
 # </editor-fold>
 
@@ -2783,47 +2787,45 @@ df_young = df[df['age'] == '60-65']
 df_old = df[df['age'] == '65-70']
 del df_young['age'], df_old['age']
 
-
 # Sort index
 df_young = df_young.pivot(index=['clusters'], columns='senescence_gradient',
                           values='norm').reindex(columns=['Hspot', 'dist300', 'dist450', 'dist650',
                                                           'dist750', 'dist800', 'rest'],
-                                                 index=['Niche h0','Niche h7','Niche h5',
-                                                    'Niche h6','Niche h4','Niche h2',
-                                                    'Niche h1','Niche h3',])
-
+                                                 index=['Niche h0', 'Niche h7', 'Niche h5',
+                                                        'Niche h6', 'Niche h4', 'Niche h2',
+                                                        'Niche h1', 'Niche h3', ])
 
 df_old = df_old.pivot(index=['clusters'], columns='senescence_gradient',
                       values='norm').reindex(columns=['Hspot', 'dist300', 'dist450', 'dist650',
                                                       'dist750', 'dist800', 'rest'],
-                                             index=['Niche h0','Niche h7','Niche h5',
-                                                    'Niche h6','Niche h4','Niche h2',
-                                                    'Niche h1','Niche h3',])
+                                             index=['Niche h0', 'Niche h7', 'Niche h5',
+                                                    'Niche h6', 'Niche h4', 'Niche h2',
+                                                    'Niche h1', 'Niche h3', ])
 # Stackbarplot for young condition
 fig, axs = plt.subplots(1, 1, figsize=(5, 6))
-ax = df_young.plot.bar(stacked=True, color={'Hspot': 'firebrick','dist300': 'tomato',
-                                            'dist450': 'lightsalmon','dist650': 'royalblue',
-                                            'dist750': 'cornflowerblue','dist800': 'lightsteelblue',
+ax = df_young.plot.bar(stacked=True, color={'Hspot': 'firebrick', 'dist300': 'tomato',
+                                            'dist450': 'lightsalmon', 'dist650': 'royalblue',
+                                            'dist750': 'cornflowerblue', 'dist800': 'lightsteelblue',
                                             'rest': 'sandybrown'}, ax=axs, width=.9)
 sns.move_legend(ax, loc='center right', frameon=False, title='Senescence\nGradient',
-                title_fontproperties={'weight': 'bold'},bbox_to_anchor=(1.3, .5))
+                title_fontproperties={'weight': 'bold'}, bbox_to_anchor=(1.3, .5))
 ax.set_xticklabels(ax.get_xticklabels(), fontweight='bold', rotation=45, va='top', ha='right')
 ax.set_xlabel('')
 plt.savefig(os.path.join(figure_path, 'ExtFig8f_StackBarplot_HumanLV_SenesenceGradient_60-65.svg'), bbox_inches='tight')
 
 # Stackedbarplot for old condition
 fig, axs = plt.subplots(1, 1, figsize=(5, 6))
-ax = df_old.plot.bar(stacked=True, color={'Hspot': 'firebrick','dist300': 'tomato',
+ax = df_old.plot.bar(stacked=True, color={'Hspot': 'firebrick', 'dist300': 'tomato',
                                           'dist450': 'lightsalmon', 'dist650': 'royalblue',
-                                          'dist750': 'cornflowerblue','dist800': 'lightsteelblue',
+                                          'dist750': 'cornflowerblue', 'dist800': 'lightsteelblue',
                                           'rest': 'sandybrown'}, ax=axs, width=.9)
 sns.move_legend(ax, loc='center right', frameon=False, title='Senescence\nGradient',
                 title_fontproperties={'weight': 'bold'},
                 bbox_to_anchor=(1.3, .5))
 ax.set_xticklabels(ax.get_xticklabels(), fontweight='bold', rotation=45, va='top', ha='right')
 ax.set_xlabel('')
-plt.savefig(os.path.join(figure_path, 'ExtFig8f_StackBarplot_HumanLV_SenesenceGradient_65-70_Resorted.svg'), bbox_inches='tight')
-
+plt.savefig(os.path.join(figure_path, 'ExtFig8f_StackBarplot_HumanLV_SenesenceGradient_65-70_Resorted.svg'),
+            bbox_inches='tight')
 
 # </editor-fold>
 
@@ -2838,11 +2840,18 @@ plt.savefig(os.path.join(figure_path, 'ExtFig8f_StackBarplot_HumanLV_SenesenceGr
 # <editor-fold desc="Extended Figure 9b. Dotplot Do not eat me snRNA">
 ref.obs['myeloid_annot'] = [annot if annot in ['MP', 'Ccr2+MP'] else 'non-myeloid' for annot in ref.obs.annotation]
 vidal = ref[ref.obs.Experiment == 'JulianAging'].copy()
-davidrPlotting.dotplot(vidal, ['myeloid_annot', 'age'],
+vidal.obs['annot_age'] = vidal.obs['myeloid_annot'].astype(str) + '_' + vidal.obs['age'].astype(str)
+
+davidrPlotting.dotplot(vidal, 'annot_age',
                        ['Cd47', 'Sirpa', 'Cd24a', 'Pilra', 'Clec4a1', 'Clec12a',
                         'Ccr2', 'Ccl2', 'Ccl4', 'Ccl5', 'Ccr5', 'Vcam1', 'Icam1'],
+                       x_categories_order=['MP_3m', 'MP_18m',
+                                           'Ccr2+MP_3m', 'Ccr2+MP_18m',
+                                           'non-myeloid_3m', 'non-myeloid_18m'],
                        swap_axes=True, path=figure_path, filename='ExtFig9b_Dotplot_DoNotEatMe_Recluit_Mouse.svg',
-                    figsize=(4, 3.5))
+                       figsize=(4, 3.5))
+
+
 # </editor-fold>
 
 # Extended Figure  9c --> Staining
@@ -2852,8 +2861,8 @@ davidrPlotting.dotplot(vidal, ['myeloid_annot', 'age'],
 
 
 # <editor-fold desc="Extended Figure 9e. Dotplot Do not eat me in Human LV">
-davidrPlotting.dotplot(human[human.obs.region == 'LV'], 'age',['CD47', 'SIRPA',
-                        'CCL2',  'ICAM1'], figsize=(2.5, 2.3),
+davidrPlotting.dotplot(human[human.obs.region == 'LV'], 'age', ['CD47', 'SIRPA',
+                                                                'CCL2', 'ICAM1'], figsize=(2.5, 2.3),
                        swap_axes=True, path=figure_path,
                        filename='ExtFig9e_Dotplot_DotNotEatMe_Recluit_HumanLV_reduced.svg')
 
@@ -2901,5 +2910,3 @@ davidrPlotting.dotplot(human[human.obs.region == 'LV'], 'age',['CD47', 'SIRPA',
 
 
 # Extended Figure 12c --> Representative image for D+Q and Fisetin
-
-
