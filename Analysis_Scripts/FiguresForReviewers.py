@@ -240,3 +240,63 @@ for names, table in [('3m', table_3m), ('18m', table_18m)]:
 table_main.to_excel(figure_path / 'DGE_LV_vs_RV_SPlittingCondition.xlsx', index=False)
 # </editor-fold>
 
+
+########################################################################################################################
+# - Check correlation
+########################################################################################################################
+
+import polars
+path = Path('/media/Storage/DavidR')
+import matplotlib.colors
+
+
+old_mu = polars.read_excel(path / 'Visium_Old_mu.xlsx')
+old_mu = old_mu.to_pandas()
+old_mu.set_index('__UNNAMED__0', inplace=True)
+
+old_data = polars.read_excel(path / 'Visium_Old_data.xlsx')
+old_data = old_data.to_pandas()
+old_data.set_index('__UNNAMED__0', inplace=True)
+
+young_mu = polars.read_excel(path / 'Visium_Young_mu.xlsx')
+young_mu = young_mu.to_pandas()
+young_mu.set_index('__UNNAMED__0', inplace=True)
+
+young_data = polars.read_excel(path / 'Visium_Young_data.xlsx')
+young_data = young_data.to_pandas()
+young_data.set_index('__UNNAMED__0', inplace=True)
+
+
+fig, axs = plt.subplots(1, 1, figsize=(7, 6))
+x = np.log10(old_data.values.flatten() + 1)
+y = np.log10(old_mu.values.flatten() + 1)
+# Compute Pearson correlation
+corr = np.corrcoef(x, y)[0, 1]
+# Plot 2D histogram
+plt.hist2d(x, y, bins=50, norm=matplotlib.colors.LogNorm(), cmap='viridis')
+plt.colorbar(label='log10(Counts)')
+# Add correlation as text
+plt.text(0.05, 0.95, f'Pearson r = {corr:.3f}', transform=plt.gca().transAxes,
+         fontsize=12, verticalalignment='top', bbox=dict(boxstyle="round", facecolor="white", alpha=0.5))
+axs.set_xlabel('Observed Data')
+axs.set_ylabel('Posterior expected Data')
+axs.set_title('Reconstruction Accuracy\n18m Condition')
+plt.savefig(figure_path / 'ReconstructionAccuracy_VisiumOld.svg', bbox_inches='tight')
+
+
+
+fig, axs = plt.subplots(1, 1, figsize=(7, 6))
+x = np.log10(young_data.values.flatten() + 1)
+y = np.log10(young_mu.values.flatten() + 1)
+# Compute Pearson correlation
+corr = np.corrcoef(x, y)[0, 1]
+# Plot 2D histogram
+plt.hist2d(x, y, bins=50, norm=matplotlib.colors.LogNorm(), cmap='viridis')
+plt.colorbar(label='log10(Counts)')
+# Add correlation as text
+plt.text(0.05, 0.95, f'Pearson r = {corr:.3f}', transform=plt.gca().transAxes,
+         fontsize=12, verticalalignment='top', bbox=dict(boxstyle="round", facecolor="white", alpha=0.5))
+axs.set_xlabel('Observed Data')
+axs.set_ylabel('Posterior expected Data')
+axs.set_title('Reconstruction Accuracy\n3m Condition')
+plt.savefig(figure_path / 'ReconstructionAccuracy_VisiumYoung.svg', bbox_inches='tight')
