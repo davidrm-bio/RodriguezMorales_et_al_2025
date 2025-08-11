@@ -2910,3 +2910,106 @@ davidrPlotting.dotplot(human[human.obs.region == 'LV'], 'age', ['CD47', 'SIRPA',
 
 
 # Extended Figure 12c --> Representative image for D+Q and Fisetin
+
+
+########################################################################################################################
+# - Add stats to Heatmaps and correct figure 3f
+########################################################################################################################
+
+import dotools_py as do  # Developmental mode
+from scipy.stats import mannwhitneyu
+
+# Heatmap Figure 2c
+df = aging.obsm['c2l_prop'].copy()  # Take the predicted celltype abundance
+
+adata_ct = ad.AnnData(df)
+adata_ct.obs[aging.obs.columns] = aging.obs.copy()
+
+do.pl.heatmap(adata_ct, 'clusters', adata_ct.var_names, add_stats=True,
+              yticklabels=1, xticklabels=1, xticks_rotation=45,
+              z_score='group', vmax=2.5, vmin=2.5, log2fc_cutoff=0.25, figsize=(10, 8),
+              path=figure_path, filename='Heatmap_cts_clusters_significance.pdf')
+
+
+# Heatmap Figure 2f
+do.tl.rank_genes_groups(aging, groupby='clusters')
+fig2f = do.get.dge_results(aging)
+
+fig2f = fig2f[fig2f.GeneName.isin(['Fgr', 'Irf7', 'Bst2', 'Cd209g', 'Cd209f', 'Ccl8', 'Ccl6', 'Timp2', 'Vsig4']) &
+              (fig2f.padj < 0.05) & (fig2f.log2fc > 0.25)]
+
+
+# Heatmap 3e
+do.tl.rank_genes_groups(adata_ccc, 'clusters')
+fig3eI = do.get.dge_results(adata_ccc)
+fig3eI = fig3eI[(fig3eI.GeneName == 'C3 :C3ar1') & (fig3eI.padj < 0.05) & (fig3eI.log2fc > 0.25)]
+
+do.tl.rank_genes_groups(aging, 'clusters')
+fig3eII = do.get.dge_results(aging)
+fig3eII = fig3eII[(fig3eII.GeneName.isin(['C3', 'C3ar1'])) &
+                  (fig3eII.padj < 0.05) & (fig3eII.log2fc > 0.25)]
+
+# Bar plot 3f
+df = do.get.expr(adata_ccc, adata_ccc.var_names, ['condition', 'sample'])
+df_ce = df[df.genes == 'C3 :C3ar1']
+df_sample = df_ce.groupby(['condition', 'sample', 'genes']).agg('median').reset_index()
+
+def iqr_test(data):
+    Q1 = data['expr'].quantile(0.25)
+    Q3 = data['expr'].quantile(0.75)
+    IQR = Q3 - Q1
+    # Determine outlier boundaries
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    outliers = data[(data['expr'] < lower_bound) | (data['expr'] > upper_bound)]
+    return outliers
+
+
+out_y = iqr_test(df_sample[df_sample.condition == 'Young'])
+out_o = iqr_test(df_sample[df_sample.condition == 'Old'])  # Old_1
+
+df = do.get.expr(adata_ccc, adata_ccc.var_names, ['condition', 'sample'])
+df_ce = df[(df.genes == 'C3 :C3ar1') & (df['sample'] != 'Old_1')]
+df_sample = df_ce.groupby(['condition', 'sample', 'genes']).agg('median').reset_index()
+
+_, p_mwh = mannwhitneyu(df_sample[df_sample.condition == 'Old']['expr'],
+                        df_sample[df_sample.condition == 'Young']['expr'])
+# 0.0317
+
+fig, axs = plt.subplots(1, 1, figsize=(3, 5))
+sns.barplot(df_ce, x='condition', y='expr', estimator='median', ax=axs, capsize=0.1,
+            palette={'Young': 'sandybrown', 'Old': 'royalblue'})
+sns.stripplot(df_sample, x='condition', y='expr', ax=axs, color='k')
+axs.set_xlabel('')
+axs.set_ylabel('Median CE strength')
+axs.set_xticklabels(['3m', '18m'], fontweight='bold', fontsize=14)
+axs.set_title('C3:C3ar1')
+plt.savefig(Path(figure_path) / 'Barplot_3f_C3C3ar1.pdf', bbox_inches='tight')
+
+# Heatmap 5d
+df = aging.obsm['c2l_prop'].copy()
+adata_ct = ad.AnnData(df)
+adata_ct.obs[aging.obs.columns] = aging.obs.copy()
+
+do.tl.rank_genes_groups(adata_ct, 'senescence_gradient')
+fig5d = do.get.dge_results(adata_ct)
+fig5d = fig5d[(fig5d.padj < 0.05) & (fig5d.log2fc > 0.25)]
+
+# Heatmap extended figure 8b
+df = human.obsm['prop'].copy()  # Take the predicted celltype abundance
+adata_ct = ad.AnnData(df)
+adata_ct = adata_ct[:, adata_ct.var_names.isin(['vCM1', 'vCM2', 'vCM3_stressed', 'vCM4', 'vCM5',
+                                                'FB1', 'FB2', 'FB3', 'FB4_activated', 'FB5', 'FB6',
+                                                'SMC1_basic', 'SMC2_art',
+                                                'PC1_vent',
+                                                'EC1_cap', 'EC2_cap', 'EC3_cap',
+                                                'EC5_art', 'EC6_ven', 'EC7_endocardial', 'EC8_ln',
+                                                'Meso',
+                                                'LYVE1+TIMD4+MP', 'MoMP',
+                                                'B', 'CD4+T_naive'])]
+
+adata_ct.obs[human.obs.columns] = human.obs.copy()
+
+do.tl.rank_genes_groups(adata_ct, 'clusters')
+extfig8b = do.get.dge_results(adata_ct)
+extfig8b = extfig8b[(extfig8b.padj < 0.05) & (extfig8b.log2fc > 0.25)]
